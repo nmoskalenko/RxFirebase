@@ -1,0 +1,55 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
+
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath 'com.novoda:bintray-release:0.3.4'
+  }
+}
+android {
+
+  packagingOptions {
+    exclude 'META-INF/LICENSE'
+    exclude 'META-INF/LICENSE-FIREBASE.txt'
+    exclude 'META-INF/NOTICE'
+  }
+
+  compileSdkVersion 23
+  buildToolsVersion "23.0.2"
+
+  defaultConfig {
+    minSdkVersion 16
+    targetSdkVersion 23
+    versionCode 1
+    versionName "0.0.1"
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_7
+    targetCompatibility JavaVersion.VERSION_1_7
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
+  }
+}
+dependencies {
+  compile 'com.firebase:firebase-client-android:2.5.2'
+  compile 'io.reactivex:rxjava:1.1.0'
+  compile 'com.android.support:support-annotations:23.3.0'
+}
+
+publish {
+  userOrg = 'kelvin'
+  groupId = 'com.kelvinapps'
+  artifactId = 'rxfirebase'
+  publishVersion = '0.0.1'
+  desc = 'RxJava wrapper above Google Firebase'
+  website = 'https://github.com/nmoskalenko/rxFirebase'
+}
