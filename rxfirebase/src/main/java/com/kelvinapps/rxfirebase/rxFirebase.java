@@ -66,7 +66,7 @@ public class rxFirebase {
         });
     }
 
-    public static Observable<AuthData> authWithOAuthToken(@NonNull final Firebase firebase,
+    public static Observable<AuthData> authWithCustomToken(@NonNull final Firebase firebase,
                                                           @NonNull final String token) {
         return Observable.create(new Observable.OnSubscribe<AuthData>() {
             @Override
