@@ -53,7 +53,7 @@ public class SampleActivity extends AppCompatActivity {
                     }
                 });
 
-        // observe posts list under "posts" child.
+        // observe single user "gracehop"
         rxFirebase.observeSingleValue(firebase.child("users").child("gracehop"), User.class)
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<User>() {

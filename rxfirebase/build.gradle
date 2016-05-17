@@ -64,6 +64,6 @@ publish {
   groupId = 'com.kelvinapps'
   artifactId = 'rxfirebase'
   publishVersion = '0.0.3'
-  desc = 'RxJava wrapper above Google Firebase'
+  desc = 'RxJava wrapper on Google Firebase for Android library'
   website = 'https://github.com/nmoskalenko/rxFirebase'
 }
