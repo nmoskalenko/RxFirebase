@@ -2,8 +2,11 @@ package kelvinapps.com.sample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.kelvinapps.rxfirebase.rxFirebase;
 
@@ -24,6 +27,21 @@ public class SampleActivity extends AppCompatActivity {
 
         // create Firebase reference
         Firebase firebase = new Firebase("https://docs-examples.firebaseio.com/android/saving-data/fireblog");
+
+        // try to authenticate.
+        // will fire exception because example Firebase storage doesn't support authentication
+        rxFirebase.authAnonymously(firebase)
+                .subscribe(new Action1<AuthData>() {
+                    @Override
+                    public void call(AuthData authData) {
+                        Log.i("rxFirebaseSample", authData.toString());
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
+                    }
+                });
 
         // observe posts list under "posts" child.
         rxFirebase.observeValuesList(firebase.child("posts"), BlogPost.class)
