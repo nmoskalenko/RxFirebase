@@ -6,10 +6,17 @@
 RxJava wrapper on Google's [Firebase for Android](https://www.firebase.com/docs/android/) library.
 
 
-Usage
-----------
+## Usage
+Library provides set of static methods of rxFirebase class.
 
-### Authentication:
+##### Authentication:
+
+According to Firebase API there are 4 different authentication methods:
+- authAnonymously
+- authWithPassword
+- authWithOAuthToken
+- authWithCustomToken
+
 
 ```java
     Firebase firebase = new Firebase("https://docs-examples.firebaseio.com/android/saving-data/fireblog");
@@ -28,7 +35,9 @@ Usage
                 });
 ```
 
-### Query single value:
+##### Query single value:
+You need to provide Firebase Query object and Class you are expecting in response and rxFirebase will do the rest.
+
 ```java
     rxFirebase.observeSingleValue(firebase.child("users").child("gracehop"), User.class)
                 .subscribe(new Action1<User>() {
@@ -39,7 +48,9 @@ Usage
                 });
 ```
 
-### Query values list:
+##### Query values list:
+To query the list of values you need to provide Firebase Query object and Class of value.
+
 ```java
     rxFirebase.observeValuesList(firebase.child("posts"), BlogPost.class)
                 .subscribe(new Action1<List<BlogPost>>() {
@@ -51,17 +62,16 @@ Usage
 ```
 
 
-Download
-----------
+## Download
 
-Gradle:
-```
+##### Gradle:
+```groovy
 dependencies {
   compile 'com.kelvinapps:rxfirebase:0.0.3'
 }
 ```
 
-Maven:
+##### Maven:
 ```
 <dependency>
   <groupId>com.kelvinapps</groupId>
@@ -72,9 +82,7 @@ Maven:
 ```
 
 
-License
--------
-
+## License
     Copyright 2016 Nickolay Moskalenko
 
     Licensed under the Apache License, Version 2.0 (the "License");
