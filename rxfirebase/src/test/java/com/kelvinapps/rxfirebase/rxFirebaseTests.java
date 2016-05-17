@@ -1,6 +1,7 @@
 package com.kelvinapps.rxfirebase;
 
 import com.firebase.client.AuthData;
+import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -49,11 +50,22 @@ public class rxFirebaseTests {
     TestData testData = new TestData();
     List<TestData> testDataList = new ArrayList<>();
 
+    rxFirebaseChildEvent<TestData> testChildEventAdded;
+    rxFirebaseChildEvent<TestData> testChildEventChanged;
+    rxFirebaseChildEvent<TestData> testChildEventRemoved;
+    rxFirebaseChildEvent<TestData> testChildEventMoved;
+
+
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
 
         testDataList.add(testData);
+        testChildEventAdded = new rxFirebaseChildEvent<>(testData, "root", rxFirebaseChildEvent.EventType.ADDED);
+        testChildEventChanged = new rxFirebaseChildEvent<>(testData, "root", rxFirebaseChildEvent.EventType.CHANGED);
+        testChildEventRemoved = new rxFirebaseChildEvent<>(testData, rxFirebaseChildEvent.EventType.REMOVED);
+        testChildEventMoved = new rxFirebaseChildEvent<>(testData, "root", rxFirebaseChildEvent.EventType.MOVED);
+
         when(mockFirebaseDataSnapshot.getValue(TestData.class)).thenReturn(testData);
         when(mockFirebaseDataSnapshot.getChildren()).thenReturn(Arrays.asList(mockFirebaseDataSnapshot));
     }
@@ -97,7 +109,7 @@ public class rxFirebaseTests {
     }
 
     @Test
-    public void testAuthWithPasswordAuthError() throws InterruptedException {
+    public void testAuthWithPassword_AuthError() throws InterruptedException {
 
         TestSubscriber<AuthData> testSubscriber = new TestSubscriber<>();
         rxFirebase.authWithPassword(mockFirebase, "email", "password")
@@ -213,7 +225,7 @@ public class rxFirebaseTests {
     }
 
     @Test
-    public void testObserveSingleValueDisconnected() throws InterruptedException {
+    public void testObserveSingleValue_Disconnected() throws InterruptedException {
 
         TestSubscriber<TestData> testSubscriber = new TestSubscriber<>();
         rxFirebase.observeSingleValue(mockFirebase, TestData.class)
@@ -230,7 +242,7 @@ public class rxFirebaseTests {
     }
 
     @Test
-    public void testObserveValuesListFailed() throws InterruptedException {
+    public void testObserveValuesList_Failed() throws InterruptedException {
 
         TestSubscriber<List<TestData>> testSubscriber = new TestSubscriber<>();
         rxFirebase.observeValuesList(mockFirebase, TestData.class)
@@ -262,6 +274,100 @@ public class rxFirebaseTests {
         testSubscriber.assertValueCount(1);
         testSubscriber.assertReceivedOnNext(Collections.singletonList(testDataList));
         testSubscriber.assertCompleted();
+        testSubscriber.unsubscribe();
+    }
+
+
+    @Test
+    public void testObserveChildrenEvents_Added() throws InterruptedException {
+
+        TestSubscriber<rxFirebaseChildEvent<TestData>> testSubscriber = new TestSubscriber<>();
+        rxFirebase.observeChildrenEvents(mockFirebase, TestData.class)
+                .subscribeOn(Schedulers.immediate())
+                .subscribe(testSubscriber);
+
+        ArgumentCaptor<ChildEventListener> argument = ArgumentCaptor.forClass(ChildEventListener.class);
+        verify(mockFirebase).addChildEventListener(argument.capture());
+        argument.getValue().onChildAdded(mockFirebaseDataSnapshot, "root");
+
+        testSubscriber.assertNoErrors();
+        testSubscriber.assertValueCount(1);
+        testSubscriber.assertReceivedOnNext(Collections.singletonList(testChildEventAdded));
+        testSubscriber.assertNotCompleted();
+        testSubscriber.unsubscribe();
+    }
+
+    @Test
+    public void testObserveChildrenEvents_Changed() throws InterruptedException {
+
+        TestSubscriber<rxFirebaseChildEvent<TestData>> testSubscriber = new TestSubscriber<>();
+        rxFirebase.observeChildrenEvents(mockFirebase, TestData.class)
+                .subscribeOn(Schedulers.immediate())
+                .subscribe(testSubscriber);
+
+        ArgumentCaptor<ChildEventListener> argument = ArgumentCaptor.forClass(ChildEventListener.class);
+        verify(mockFirebase).addChildEventListener(argument.capture());
+        argument.getValue().onChildChanged(mockFirebaseDataSnapshot, "root");
+
+        testSubscriber.assertNoErrors();
+        testSubscriber.assertValueCount(1);
+        testSubscriber.assertReceivedOnNext(Collections.singletonList(testChildEventChanged));
+        testSubscriber.assertNotCompleted();
+        testSubscriber.unsubscribe();
+    }
+
+    @Test
+    public void testObserveChildrenEvents_Removed() throws InterruptedException {
+
+        TestSubscriber<rxFirebaseChildEvent<TestData>> testSubscriber = new TestSubscriber<>();
+        rxFirebase.observeChildrenEvents(mockFirebase, TestData.class)
+                .subscribeOn(Schedulers.immediate())
+                .subscribe(testSubscriber);
+
+        ArgumentCaptor<ChildEventListener> argument = ArgumentCaptor.forClass(ChildEventListener.class);
+        verify(mockFirebase).addChildEventListener(argument.capture());
+        argument.getValue().onChildRemoved(mockFirebaseDataSnapshot);
+
+        testSubscriber.assertNoErrors();
+        testSubscriber.assertValueCount(1);
+        testSubscriber.assertReceivedOnNext(Collections.singletonList(testChildEventRemoved));
+        testSubscriber.assertNotCompleted();
+        testSubscriber.unsubscribe();
+    }
+
+    @Test
+    public void testObserveChildrenEvents_Moved() throws InterruptedException {
+
+        TestSubscriber<rxFirebaseChildEvent<TestData>> testSubscriber = new TestSubscriber<>();
+        rxFirebase.observeChildrenEvents(mockFirebase, TestData.class)
+                .subscribeOn(Schedulers.immediate())
+                .subscribe(testSubscriber);
+
+        ArgumentCaptor<ChildEventListener> argument = ArgumentCaptor.forClass(ChildEventListener.class);
+        verify(mockFirebase).addChildEventListener(argument.capture());
+        argument.getValue().onChildMoved(mockFirebaseDataSnapshot, "root");
+
+        testSubscriber.assertNoErrors();
+        testSubscriber.assertValueCount(1);
+        testSubscriber.assertReceivedOnNext(Collections.singletonList(testChildEventMoved));
+        testSubscriber.assertNotCompleted();
+        testSubscriber.unsubscribe();
+    }
+
+    @Test
+    public void testObserveChildrenEvents_Cancelled() throws InterruptedException {
+
+        TestSubscriber<rxFirebaseChildEvent<TestData>> testSubscriber = new TestSubscriber<>();
+        rxFirebase.observeChildrenEvents(mockFirebase, TestData.class)
+                .subscribeOn(Schedulers.immediate())
+                .subscribe(testSubscriber);
+
+        ArgumentCaptor<ChildEventListener> argument = ArgumentCaptor.forClass(ChildEventListener.class);
+        verify(mockFirebase).addChildEventListener(argument.capture());
+        argument.getValue().onCancelled(new FirebaseError(FirebaseError.OPERATION_FAILED, "operation failed"));
+
+        testSubscriber.assertError(rxFirebaseException.class);
+        testSubscriber.assertNotCompleted();
         testSubscriber.unsubscribe();
     }
 

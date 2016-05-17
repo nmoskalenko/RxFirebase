@@ -39,6 +39,14 @@ android {
     }
   }
 }
+
+tasks.withType(Test) {
+  testLogging {
+    events "started", "passed", "skipped", "failed"
+  }
+}
+
+
 dependencies {
   compile 'com.firebase:firebase-client-android:2.5.2'
   compile 'io.reactivex:rxjava:1.1.0'

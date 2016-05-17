@@ -3,6 +3,7 @@ package com.kelvinapps.rxfirebase;
 import android.support.annotation.NonNull;
 
 import com.firebase.client.AuthData;
+import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -67,7 +68,7 @@ public class rxFirebase {
     }
 
     public static Observable<AuthData> authWithCustomToken(@NonNull final Firebase firebase,
-                                                          @NonNull final String token) {
+                                                           @NonNull final String token) {
         return Observable.create(new Observable.OnSubscribe<AuthData>() {
             @Override
             public void call(final Subscriber<? super AuthData> subscriber) {
@@ -144,6 +145,61 @@ public class rxFirebase {
 
         });
     }
+
+    public static <T> Observable<rxFirebaseChildEvent<T>> observeChildrenEvents(@NonNull final Query ref, @NonNull final Class<T> clazz) {
+        return Observable.create(new Observable.OnSubscribe<rxFirebaseChildEvent<T>>() {
+            @Override
+            public void call(final Subscriber<? super rxFirebaseChildEvent<T>> subscriber) {
+                final ChildEventListener childEventListener =
+                        ref.addChildEventListener(new ChildEventListener() {
+
+                            @Override
+                            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
+                                subscriber.onNext(
+                                        new rxFirebaseChildEvent<T>(dataSnapshot.getValue(clazz),
+                                                previousChildName,
+                                                rxFirebaseChildEvent.EventType.ADDED));
+                            }
+
+                            @Override
+                            public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
+                                subscriber.onNext(
+                                        new rxFirebaseChildEvent<T>(dataSnapshot.getValue(clazz),
+                                                previousChildName,
+                                                rxFirebaseChildEvent.EventType.CHANGED));
+                            }
+
+                            @Override
+                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                                subscriber.onNext(
+                                        new rxFirebaseChildEvent<T>(dataSnapshot.getValue(clazz),
+                                                rxFirebaseChildEvent.EventType.REMOVED));
+                            }
+
+                            @Override
+                            public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
+                                subscriber.onNext(
+                                        new rxFirebaseChildEvent<T>(dataSnapshot.getValue(clazz),
+                                                previousChildName,
+                                                rxFirebaseChildEvent.EventType.MOVED));
+                            }
+
+                            @Override
+                            public void onCancelled(FirebaseError error) {
+                                onError(subscriber, error);
+                            }
+                        });
+
+                subscriber.add(Subscriptions.create(new Action0() {
+                    @Override
+                    public void call() {
+                        ref.removeEventListener(childEventListener);
+                    }
+                }));
+            }
+        });
+    }
+
 
     private static void onError(@NonNull Subscriber subscriber, @NonNull FirebaseError firebaseError) {
         subscriber.onError(new rxFirebaseException(firebaseError));
