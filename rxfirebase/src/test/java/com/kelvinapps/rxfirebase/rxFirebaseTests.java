@@ -1,10 +1,10 @@
-package com.kelvinapps.firebase;
+package com.kelvinapps.rxfirebase;
 
 import com.firebase.client.AuthData;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
-import com.kelvinapps.rxfirebase.rxFirebase;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +15,9 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
@@ -29,6 +31,11 @@ import static org.mockito.Mockito.when;
  */
 public class rxFirebaseTests {
 
+    class TestData {
+        int id;
+        String str;
+    }
+
     @Mock
     private Firebase mockFirebase;
 
@@ -39,15 +46,15 @@ public class rxFirebaseTests {
     private DataSnapshot mockFirebaseDataSnapshot;
 
 
-    TestClass testData = new TestClass();
-    List<TestClass> testDataList = new ArrayList<>();
+    TestData testData = new TestData();
+    List<TestData> testDataList = new ArrayList<>();
 
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
 
         testDataList.add(testData);
-        when(mockFirebaseDataSnapshot.getValue(TestClass.class)).thenReturn(testData);
+        when(mockFirebaseDataSnapshot.getValue(TestData.class)).thenReturn(testData);
         when(mockFirebaseDataSnapshot.getChildren()).thenReturn(Arrays.asList(mockFirebaseDataSnapshot));
     }
 
@@ -90,6 +97,23 @@ public class rxFirebaseTests {
     }
 
     @Test
+    public void testAuthWithPasswordAuthError() throws InterruptedException {
+
+        TestSubscriber<AuthData> testSubscriber = new TestSubscriber<>();
+        rxFirebase.authWithPassword(mockFirebase, "email", "password")
+                .subscribeOn(Schedulers.immediate())
+                .subscribe(testSubscriber);
+
+        ArgumentCaptor<Firebase.AuthResultHandler> argument = ArgumentCaptor.forClass(Firebase.AuthResultHandler.class);
+        verify(mockFirebase).authWithPassword(eq("email"), eq("password"), argument.capture());
+        argument.getValue().onAuthenticationError(new FirebaseError(FirebaseError.INVALID_PASSWORD, "invalid password"));
+
+        testSubscriber.assertError(rxFirebaseException.class);
+        testSubscriber.assertNotCompleted();
+        testSubscriber.unsubscribe();
+    }
+
+    @Test
     public void testAuthWithOAuthToken() throws InterruptedException {
 
         TestSubscriber<AuthData> testSubscriber = new TestSubscriber<>();
@@ -99,6 +123,29 @@ public class rxFirebaseTests {
 
         ArgumentCaptor<Firebase.AuthResultHandler> argument = ArgumentCaptor.forClass(Firebase.AuthResultHandler.class);
         verify(mockFirebase).authWithOAuthToken(eq("provider"), eq("token"), argument.capture());
+        argument.getValue().onAuthenticated(mockAuthData);
+
+        testSubscriber.assertNoErrors();
+        testSubscriber.assertValueCount(1);
+        testSubscriber.assertReceivedOnNext(Collections.singletonList(mockAuthData));
+        testSubscriber.assertCompleted();
+        testSubscriber.unsubscribe();
+    }
+
+    @Test
+    public void testAuthWithOAuthTokenWithOptions() throws InterruptedException {
+
+        Map<String, String> options = new HashMap<>();
+        options.put("option1", "value1");
+        options.put("option2", "value2");
+
+        TestSubscriber<AuthData> testSubscriber = new TestSubscriber<>();
+        rxFirebase.authWithOAuthToken(mockFirebase, "provider", options)
+                .subscribeOn(Schedulers.immediate())
+                .subscribe(testSubscriber);
+
+        ArgumentCaptor<Firebase.AuthResultHandler> argument = ArgumentCaptor.forClass(Firebase.AuthResultHandler.class);
+        verify(mockFirebase).authWithOAuthToken(eq("provider"), eq(options), argument.capture());
         argument.getValue().onAuthenticated(mockAuthData);
 
         testSubscriber.assertNoErrors();
@@ -149,8 +196,8 @@ public class rxFirebaseTests {
     @Test
     public void testObserveSingleValue() throws InterruptedException {
 
-        TestSubscriber<TestClass> testSubscriber = new TestSubscriber<>();
-        rxFirebase.observeSingleValue(mockFirebase, TestClass.class)
+        TestSubscriber<TestData> testSubscriber = new TestSubscriber<>();
+        rxFirebase.observeSingleValue(mockFirebase, TestData.class)
                 .subscribeOn(Schedulers.immediate())
                 .subscribe(testSubscriber);
 
@@ -166,10 +213,44 @@ public class rxFirebaseTests {
     }
 
     @Test
+    public void testObserveSingleValueDisconnected() throws InterruptedException {
+
+        TestSubscriber<TestData> testSubscriber = new TestSubscriber<>();
+        rxFirebase.observeSingleValue(mockFirebase, TestData.class)
+                .subscribeOn(Schedulers.immediate())
+                .subscribe(testSubscriber);
+
+        ArgumentCaptor<ValueEventListener> argument = ArgumentCaptor.forClass(ValueEventListener.class);
+        verify(mockFirebase).addListenerForSingleValueEvent(argument.capture());
+        argument.getValue().onCancelled(new FirebaseError(FirebaseError.DISCONNECTED, "disconnected"));
+
+        testSubscriber.assertError(rxFirebaseException.class);
+        testSubscriber.assertNotCompleted();
+        testSubscriber.unsubscribe();
+    }
+
+    @Test
+    public void testObserveValuesListFailed() throws InterruptedException {
+
+        TestSubscriber<List<TestData>> testSubscriber = new TestSubscriber<>();
+        rxFirebase.observeValuesList(mockFirebase, TestData.class)
+                .subscribeOn(Schedulers.immediate())
+                .subscribe(testSubscriber);
+
+        ArgumentCaptor<ValueEventListener> argument = ArgumentCaptor.forClass(ValueEventListener.class);
+        verify(mockFirebase).addListenerForSingleValueEvent(argument.capture());
+        argument.getValue().onCancelled(new FirebaseError(FirebaseError.OPERATION_FAILED, "operation failed"));
+
+        testSubscriber.assertError(rxFirebaseException.class);
+        testSubscriber.assertNotCompleted();
+        testSubscriber.unsubscribe();
+    }
+
+    @Test
     public void testObserveValuesList() throws InterruptedException {
 
-        TestSubscriber<List<TestClass>> testSubscriber = new TestSubscriber<>();
-        rxFirebase.observeValuesList(mockFirebase, TestClass.class)
+        TestSubscriber<List<TestData>> testSubscriber = new TestSubscriber<>();
+        rxFirebase.observeValuesList(mockFirebase, TestData.class)
                 .subscribeOn(Schedulers.immediate())
                 .subscribe(testSubscriber);
 
@@ -183,5 +264,6 @@ public class rxFirebaseTests {
         testSubscriber.assertCompleted();
         testSubscriber.unsubscribe();
     }
+
 
 }

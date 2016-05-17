@@ -10,6 +10,7 @@ public class rxFirebaseException extends Exception {
     protected FirebaseError error;
 
     public rxFirebaseException(FirebaseError error) {
+        this.error = error;
     }
 
     public FirebaseError getError() {
