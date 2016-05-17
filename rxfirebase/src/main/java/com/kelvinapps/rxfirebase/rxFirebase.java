@@ -129,8 +129,8 @@ public class rxFirebase {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         List<T> items = new ArrayList<T>();
-                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                            items.add(postSnapshot.getValue(clazz));
+                        for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                            items.add(childSnapshot.getValue(clazz));
                         }
                         subscriber.onNext(items);
                         subscriber.onCompleted();
