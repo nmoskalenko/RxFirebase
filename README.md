@@ -25,8 +25,8 @@ According to Firebase API there are 4 different authentication methods:
     rxFirebaseAuth.signInAnonymously(FirebaseAuth.getInstance())
                 .subscribe(new Action1<AuthResult>() {
                     @Override
-                    public void call(AuthResult authData) {
-                        // process with authData
+                    public void call(AuthResult authResult) {
+                        // process with authResult
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -68,7 +68,7 @@ or the list of values:
 dependencies {
   compile 'com.google.firebase:firebase-auth:9.0.0'
   compile 'com.google.firebase:firebase-database:9.0.0'
-  compile 'com.kelvinapps:rxfirebase:0.0.5'
+  compile 'com.kelvinapps:rxfirebase:0.0.6'
 }
 ```
 
@@ -77,7 +77,7 @@ dependencies {
 <dependency>
   <groupId>com.kelvinapps</groupId>
   <artifactId>rxfirebase</artifactId>
-  <version>0.0.5</version>
+  <version>0.0.6</version>
   <type>pom</type>
 </dependency>
 ```

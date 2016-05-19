@@ -12,7 +12,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import rx.Observable;
-import rx.Observer;
 import rx.Subscriber;
 import rx.functions.Action0;
 import rx.subscriptions.Subscriptions;
@@ -22,6 +21,7 @@ import rx.subscriptions.Subscriptions;
  */
 public class rxFirebaseAuth {
 
+    @NonNull
     public static Observable<AuthResult> signInAnonymously(@NonNull final FirebaseAuth firebaseAuth) {
         return Observable.create(new Observable.OnSubscribe<AuthResult>() {
             @Override
@@ -35,6 +35,7 @@ public class rxFirebaseAuth {
         });
     }
 
+    @NonNull
     public static Observable<AuthResult> signInWithEmailAndPassword(@NonNull final FirebaseAuth firebaseAuth,
                                                                     @NonNull final String email,
                                                                     @NonNull final String password) {
@@ -50,6 +51,7 @@ public class rxFirebaseAuth {
         });
     }
 
+    @NonNull
     public static Observable<AuthResult> signInWithCredential(@NonNull final FirebaseAuth firebaseAuth,
                                                               @NonNull final AuthCredential credential) {
         return Observable.create(new Observable.OnSubscribe<AuthResult>() {
@@ -64,6 +66,7 @@ public class rxFirebaseAuth {
         });
     }
 
+    @NonNull
     public static Observable<AuthResult> signInWithCustomToken(@NonNull final FirebaseAuth firebaseAuth,
                                                                @NonNull final String token) {
         return Observable.create(new Observable.OnSubscribe<AuthResult>() {
@@ -78,6 +81,7 @@ public class rxFirebaseAuth {
         });
     }
 
+    @NonNull
     public static Observable<FirebaseUser> observeAuthState(@NonNull final FirebaseAuth firebaseAuth) {
 
         return Observable.create(new Observable.OnSubscribe<FirebaseUser>() {
@@ -86,7 +90,9 @@ public class rxFirebaseAuth {
                 final FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {
                     @Override
                     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                        subscriber.onNext(firebaseAuth.getCurrentUser());
+                        if (!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(firebaseAuth.getCurrentUser());
+                        }
                     }
                 };
                 firebaseAuth.addAuthStateListener(authStateListener);
@@ -104,25 +110,31 @@ public class rxFirebaseAuth {
     private static class ObservableAuthResultHandler
             implements OnSuccessListener<AuthResult>, OnFailureListener, OnCompleteListener<AuthResult> {
 
-        private final Observer<? super AuthResult> observer;
+        private final Subscriber<? super AuthResult> subscriber;
 
-        private ObservableAuthResultHandler(Observer<? super AuthResult> observer) {
-            this.observer = observer;
+        private ObservableAuthResultHandler(Subscriber<? super AuthResult> observer) {
+            this.subscriber = observer;
         }
 
         @Override
         public void onSuccess(AuthResult authResult) {
-            observer.onNext(authResult);
+            if (!subscriber.isUnsubscribed()) {
+                subscriber.onNext(authResult);
+            }
         }
 
         @Override
         public void onComplete(@NonNull Task<AuthResult> task) {
-            observer.onCompleted();
+            if (!subscriber.isUnsubscribed()) {
+                subscriber.onCompleted();
+            }
         }
 
         @Override
         public void onFailure(@NonNull Exception e) {
-            observer.onError(e);
+            if (!subscriber.isUnsubscribed()) {
+                subscriber.onError(e);
+            }
         }
     }
 }

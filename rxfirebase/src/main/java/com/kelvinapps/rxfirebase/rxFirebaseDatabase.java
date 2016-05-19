@@ -32,17 +32,25 @@ public class rxFirebaseDatabase {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         T value = dataSnapshot.getValue(clazz);
                         if (value != null) {
-                            subscriber.onNext(value);
+                            if (!subscriber.isUnsubscribed()) {
+                                subscriber.onNext(value);
+                            }
                         } else {
-                            subscriber.onError(new rxFirebaseDataCastException("unable to cast firebase data response to " + clazz.getSimpleName()));
+                            if (!subscriber.isUnsubscribed()) {
+                                subscriber.onError(new rxFirebaseDataCastException("unable to cast firebase data response to " + clazz.getSimpleName()));
+                            }
                         }
 
-                        subscriber.onCompleted();
+                        if (!subscriber.isUnsubscribed()) {
+                            subscriber.onCompleted();
+                        }
                     }
 
                     @Override
                     public void onCancelled(DatabaseError error) {
-                        subscriber.onError(new rxFirebaseDataException(error));
+                        if (!subscriber.isUnsubscribed()) {
+                            subscriber.onError(new rxFirebaseDataException(error));
+                        }
                     }
                 });
 
@@ -61,18 +69,25 @@ public class rxFirebaseDatabase {
                         for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
                             T value = childSnapshot.getValue(clazz);
                             if (value == null) {
-                                subscriber.onError(new rxFirebaseDataCastException("unable to cast firebase data response to " + clazz.getSimpleName()));
+                                if (!subscriber.isUnsubscribed()) {
+                                    subscriber.onError(new rxFirebaseDataCastException("unable to cast firebase data response to " + clazz.getSimpleName()));
+                                }
                             } else {
                                 items.add(value);
                             }
                         }
-                        subscriber.onNext(items);
-                        subscriber.onCompleted();
+
+                        if (!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(items);
+                            subscriber.onCompleted();
+                        }
                     }
 
                     @Override
                     public void onCancelled(DatabaseError error) {
-                        subscriber.onError(new rxFirebaseDataException(error));
+                        if (!subscriber.isUnsubscribed()) {
+                            subscriber.onError(new rxFirebaseDataException(error));
+                        }
                     }
                 });
             }
@@ -89,38 +104,48 @@ public class rxFirebaseDatabase {
 
                             @Override
                             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
-                                subscriber.onNext(
-                                        new rxFirebaseChildEvent<T>(dataSnapshot.getValue(clazz),
-                                                previousChildName,
-                                                rxFirebaseChildEvent.EventType.ADDED));
+                                if (!subscriber.isUnsubscribed()) {
+                                    subscriber.onNext(
+                                            new rxFirebaseChildEvent<T>(dataSnapshot.getValue(clazz),
+                                                    previousChildName,
+                                                    rxFirebaseChildEvent.EventType.ADDED));
+                                }
                             }
 
                             @Override
                             public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
-                                subscriber.onNext(
-                                        new rxFirebaseChildEvent<T>(dataSnapshot.getValue(clazz),
-                                                previousChildName,
-                                                rxFirebaseChildEvent.EventType.CHANGED));
+                                if (!subscriber.isUnsubscribed()) {
+                                    subscriber.onNext(
+                                            new rxFirebaseChildEvent<T>(dataSnapshot.getValue(clazz),
+                                                    previousChildName,
+                                                    rxFirebaseChildEvent.EventType.CHANGED));
+                                }
                             }
 
                             @Override
                             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                                subscriber.onNext(
-                                        new rxFirebaseChildEvent<T>(dataSnapshot.getValue(clazz),
-                                                rxFirebaseChildEvent.EventType.REMOVED));
+                                if (!subscriber.isUnsubscribed()) {
+                                    subscriber.onNext(
+                                            new rxFirebaseChildEvent<T>(dataSnapshot.getValue(clazz),
+                                                    rxFirebaseChildEvent.EventType.REMOVED));
+                                }
                             }
 
                             @Override
                             public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
-                                subscriber.onNext(
-                                        new rxFirebaseChildEvent<T>(dataSnapshot.getValue(clazz),
-                                                previousChildName,
-                                                rxFirebaseChildEvent.EventType.MOVED));
+                                if (!subscriber.isUnsubscribed()) {
+                                    subscriber.onNext(
+                                            new rxFirebaseChildEvent<T>(dataSnapshot.getValue(clazz),
+                                                    previousChildName,
+                                                    rxFirebaseChildEvent.EventType.MOVED));
+                                }
                             }
 
                             @Override
                             public void onCancelled(DatabaseError error) {
-                                subscriber.onError(new rxFirebaseDataException(error));
+                                if (!subscriber.isUnsubscribed()) {
+                                    subscriber.onError(new rxFirebaseDataException(error));
+                                }
                             }
                         });
 

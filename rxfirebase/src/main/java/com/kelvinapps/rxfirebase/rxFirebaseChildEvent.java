@@ -1,9 +1,12 @@
 package com.kelvinapps.rxfirebase;
 
+import android.support.annotation.NonNull;
+
 /**
  * Created by Nick Moskalenko on 17/05/2016.
  */
 public class rxFirebaseChildEvent<T> {
+
 
     public enum EventType {
         ADDED,
@@ -17,39 +20,43 @@ public class rxFirebaseChildEvent<T> {
     private String previousChildName;
 
 
-    public rxFirebaseChildEvent(T data, String previousChildName,
-                                EventType eventType) {
+    public rxFirebaseChildEvent(@NonNull T data,
+                                @NonNull String previousChildName,
+                                @NonNull EventType eventType) {
         this.value = data;
         this.previousChildName = previousChildName;
         this.eventType = eventType;
     }
 
-    public rxFirebaseChildEvent(T data, EventType eventType) {
+    public rxFirebaseChildEvent(@NonNull T data, @NonNull EventType eventType) {
         this.value = data;
         this.eventType = eventType;
     }
 
+    @NonNull
     public T getValue() {
         return value;
     }
 
-    public void setValue(T value) {
+    public void setValue(@NonNull T value) {
         this.value = value;
     }
 
+    @NonNull
     public String getPreviousChildName() {
         return previousChildName;
     }
 
-    public void setPreviousChildName(String previousChildName) {
+    public void setPreviousChildName(@NonNull String previousChildName) {
         this.previousChildName = previousChildName;
     }
 
+    @NonNull
     public EventType getEventType() {
         return eventType;
     }
 
-    public void setEventType(EventType eventType) {
+    public void setEventType(@NonNull EventType eventType) {
         this.eventType = eventType;
     }
 

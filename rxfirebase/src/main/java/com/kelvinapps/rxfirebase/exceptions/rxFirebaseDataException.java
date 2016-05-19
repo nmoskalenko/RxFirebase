@@ -1,5 +1,7 @@
 package com.kelvinapps.rxfirebase.exceptions;
 
+import android.support.annotation.NonNull;
+
 import com.google.firebase.database.DatabaseError;
 
 /**
@@ -9,7 +11,7 @@ public class rxFirebaseDataException extends Exception {
 
     protected DatabaseError error;
 
-    public rxFirebaseDataException(DatabaseError error) {
+    public rxFirebaseDataException(@NonNull DatabaseError error) {
         this.error = error;
     }
 
