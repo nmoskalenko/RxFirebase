@@ -4,12 +4,15 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -18,7 +21,7 @@ import java.util.Collections;
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,7 +31,7 @@ import static org.mockito.Mockito.when;
 public class rxFirebaseAuthTests {
 
     @Mock
-    private FirebaseAuth mockDatabase;
+    private FirebaseAuth mockAuth;
 
     @Mock
     private Task<AuthResult> mockAuthTask;
@@ -39,26 +42,50 @@ public class rxFirebaseAuthTests {
     @Mock
     private DataSnapshot mockDatabaseDataSnapshot;
 
+    @Mock
+    private AuthCredential mockCredentials;
+
+    @Mock
+    private FirebaseUser mockUser;
+
+
+    private ArgumentCaptor<OnCompleteListener> testOnCompleteListener;
+    private ArgumentCaptor<OnSuccessListener> testOnSuccessListener;
+    private ArgumentCaptor<OnFailureListener> testOnFailureListener;
+
 
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        when(mockAuthTask.addOnCompleteListener(any(OnCompleteListener.class))).thenReturn(mockAuthTask);
-        when(mockAuthTask.addOnSuccessListener(any(OnSuccessListener.class))).thenReturn(mockAuthTask);
-        when(mockAuthTask.addOnFailureListener(any(OnFailureListener.class))).thenReturn(mockAuthTask);
 
-        when(mockDatabase.signInAnonymously()).thenReturn(mockAuthTask);
+        testOnCompleteListener = ArgumentCaptor.forClass(OnCompleteListener.class);
+        testOnSuccessListener = ArgumentCaptor.forClass(OnSuccessListener.class);
+        testOnFailureListener = ArgumentCaptor.forClass(OnFailureListener.class);
+
+        when(mockAuthTask.addOnCompleteListener(testOnCompleteListener.capture())).thenReturn(mockAuthTask);
+        when(mockAuthTask.addOnSuccessListener(testOnSuccessListener.capture())).thenReturn(mockAuthTask);
+        when(mockAuthTask.addOnFailureListener(testOnFailureListener.capture())).thenReturn(mockAuthTask);
+
+        when(mockAuth.signInAnonymously()).thenReturn(mockAuthTask);
+        when(mockAuth.signInWithEmailAndPassword("email", "password")).thenReturn(mockAuthTask);
+        when(mockAuth.signInWithCredential(mockCredentials)).thenReturn(mockAuthTask);
+        when(mockAuth.signInWithCustomToken("token")).thenReturn(mockAuthTask);
+
+        when(mockAuth.getCurrentUser()).thenReturn(mockUser);
     }
 
     @Test
     public void signInAnonymously() throws InterruptedException {
 
         TestSubscriber<AuthResult> testSubscriber = new TestSubscriber<>();
-        rxFirebaseAuth.signInAnonymously(mockDatabase)
+        rxFirebaseAuth.signInAnonymously(mockAuth)
                 .subscribeOn(Schedulers.immediate())
                 .subscribe(testSubscriber);
 
-        verify(mockDatabase).signInAnonymously();
+        testOnSuccessListener.getValue().onSuccess(mockAuthResult);
+        testOnCompleteListener.getValue().onComplete(mockAuthTask);
+
+        verify(mockAuth).signInAnonymously();
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
@@ -67,101 +94,118 @@ public class rxFirebaseAuthTests {
         testSubscriber.unsubscribe();
     }
 
-//    @Test
-//    public void testAuthWithPassword() throws InterruptedException {
-//
-//        TestSubscriber<AuthData> testSubscriber = new TestSubscriber<>();
-//        rxFirebase.authWithPassword(mockDatabase, "email", "password")
-//                .subscribeOn(Schedulers.immediate())
-//                .subscribe(testSubscriber);
-//
-//        ArgumentCaptor<Firebase.AuthResultHandler> argument = ArgumentCaptor.forClass(Firebase.AuthResultHandler.class);
-//        verify(mockDatabase).authWithPassword(eq("email"), eq("password"), argument.capture());
-//        argument.getValue().onAuthenticated(mockAuthData);
-//
-//        testSubscriber.assertNoErrors();
-//        testSubscriber.assertValueCount(1);
-//        testSubscriber.assertReceivedOnNext(Collections.singletonList(mockAuthData));
-//        testSubscriber.assertCompleted();
-//        testSubscriber.unsubscribe();
-//    }
-//
-//    @Test
-//    public void testAuthWithPassword_AuthError() throws InterruptedException {
-//
-//        TestSubscriber<AuthData> testSubscriber = new TestSubscriber<>();
-//        rxFirebase.authWithPassword(mockDatabase, "email", "password")
-//                .subscribeOn(Schedulers.immediate())
-//                .subscribe(testSubscriber);
-//
-//        ArgumentCaptor<Firebase.AuthResultHandler> argument = ArgumentCaptor.forClass(Firebase.AuthResultHandler.class);
-//        verify(mockDatabase).authWithPassword(eq("email"), eq("password"), argument.capture());
-//        argument.getValue().onAuthenticationError(new FirebaseError(FirebaseError.INVALID_PASSWORD, "invalid password"));
-//
-//        testSubscriber.assertError(rxFirebaseException.class);
-//        testSubscriber.assertNotCompleted();
-//        testSubscriber.unsubscribe();
-//    }
-//
-//    @Test
-//    public void testAuthWithOAuthToken() throws InterruptedException {
-//
-//        TestSubscriber<AuthData> testSubscriber = new TestSubscriber<>();
-//        rxFirebase.authWithOAuthToken(mockDatabase, "provider", "token")
-//                .subscribeOn(Schedulers.immediate())
-//                .subscribe(testSubscriber);
-//
-//        ArgumentCaptor<Firebase.AuthResultHandler> argument = ArgumentCaptor.forClass(Firebase.AuthResultHandler.class);
-//        verify(mockDatabase).authWithOAuthToken(eq("provider"), eq("token"), argument.capture());
-//        argument.getValue().onAuthenticated(mockAuthData);
-//
-//        testSubscriber.assertNoErrors();
-//        testSubscriber.assertValueCount(1);
-//        testSubscriber.assertReceivedOnNext(Collections.singletonList(mockAuthData));
-//        testSubscriber.assertCompleted();
-//        testSubscriber.unsubscribe();
-//    }
-//
-//    @Test
-//    public void testAuthWithOAuthTokenWithOptions() throws InterruptedException {
-//
-//        Map<String, String> options = new HashMap<>();
-//        options.put("option1", "value1");
-//        options.put("option2", "value2");
-//
-//        TestSubscriber<AuthData> testSubscriber = new TestSubscriber<>();
-//        rxFirebase.authWithOAuthToken(mockDatabase, "provider", options)
-//                .subscribeOn(Schedulers.immediate())
-//                .subscribe(testSubscriber);
-//
-//        ArgumentCaptor<Firebase.AuthResultHandler> argument = ArgumentCaptor.forClass(Firebase.AuthResultHandler.class);
-//        verify(mockDatabase).authWithOAuthToken(eq("provider"), eq(options), argument.capture());
-//        argument.getValue().onAuthenticated(mockAuthData);
-//
-//        testSubscriber.assertNoErrors();
-//        testSubscriber.assertValueCount(1);
-//        testSubscriber.assertReceivedOnNext(Collections.singletonList(mockAuthData));
-//        testSubscriber.assertCompleted();
-//        testSubscriber.unsubscribe();
-//    }
-//
-//    @Test
-//    public void testAuthWithCustomToken() throws InterruptedException {
-//
-//        TestSubscriber<AuthData> testSubscriber = new TestSubscriber<>();
-//        rxFirebase.authWithCustomToken(mockDatabase, "token")
-//                .subscribeOn(Schedulers.immediate())
-//                .subscribe(testSubscriber);
-//
-//        ArgumentCaptor<Firebase.AuthResultHandler> argument = ArgumentCaptor.forClass(Firebase.AuthResultHandler.class);
-//        verify(mockDatabase).authWithCustomToken(eq("token"), argument.capture());
-//        argument.getValue().onAuthenticated(mockAuthData);
-//
-//        testSubscriber.assertNoErrors();
-//        testSubscriber.assertValueCount(1);
-//        testSubscriber.assertReceivedOnNext(Collections.singletonList(mockAuthData));
-//        testSubscriber.assertCompleted();
-//        testSubscriber.unsubscribe();
-//    }
+    @Test
+    public void signInAnonymously_Failed() throws InterruptedException {
 
+        TestSubscriber<AuthResult> testSubscriber = new TestSubscriber<>();
+        rxFirebaseAuth.signInAnonymously(mockAuth)
+                .subscribeOn(Schedulers.immediate())
+                .subscribe(testSubscriber);
+
+        Exception e = new Exception("something bad happened");
+        testOnFailureListener.getValue().onFailure(e);
+
+        verify(mockAuth).signInAnonymously();
+
+        testSubscriber.assertError(e);
+        testSubscriber.assertNotCompleted();
+        testSubscriber.unsubscribe();
+    }
+
+    @Test
+    public void signInWithEmailAndPassword() throws InterruptedException {
+
+        TestSubscriber<AuthResult> testSubscriber = new TestSubscriber<>();
+        rxFirebaseAuth.signInWithEmailAndPassword(mockAuth, "email", "password")
+                .subscribeOn(Schedulers.immediate())
+                .subscribe(testSubscriber);
+
+        testOnSuccessListener.getValue().onSuccess(mockAuthResult);
+        testOnCompleteListener.getValue().onComplete(mockAuthTask);
+
+        verify(mockAuth).signInWithEmailAndPassword(eq("email"), eq("password"));
+
+        testSubscriber.assertNoErrors();
+        testSubscriber.assertValueCount(1);
+        testSubscriber.assertReceivedOnNext(Collections.singletonList(mockAuthResult));
+        testSubscriber.assertCompleted();
+        testSubscriber.unsubscribe();
+    }
+
+    @Test
+    public void signInWithEmailAndPassword_AuthError() throws InterruptedException {
+
+        TestSubscriber<AuthResult> testSubscriber = new TestSubscriber<>();
+        rxFirebaseAuth.signInWithEmailAndPassword(mockAuth, "email", "password")
+                .subscribeOn(Schedulers.immediate())
+                .subscribe(testSubscriber);
+
+        Exception e = new Exception("something bad happened");
+        testOnFailureListener.getValue().onFailure(e);
+
+        verify(mockAuth).signInWithEmailAndPassword(eq("email"), eq("password"));
+
+        testSubscriber.assertError(e);
+        testSubscriber.assertNotCompleted();
+        testSubscriber.unsubscribe();
+    }
+
+    @Test
+    public void signInWithCredential() throws InterruptedException {
+
+        TestSubscriber<AuthResult> testSubscriber = new TestSubscriber<>();
+        rxFirebaseAuth.signInWithCredential(mockAuth, mockCredentials)
+                .subscribeOn(Schedulers.immediate())
+                .subscribe(testSubscriber);
+
+        testOnSuccessListener.getValue().onSuccess(mockAuthResult);
+        testOnCompleteListener.getValue().onComplete(mockAuthTask);
+
+        verify(mockAuth).signInWithCredential(mockCredentials);
+
+        testSubscriber.assertNoErrors();
+        testSubscriber.assertValueCount(1);
+        testSubscriber.assertReceivedOnNext(Collections.singletonList(mockAuthResult));
+        testSubscriber.assertCompleted();
+        testSubscriber.unsubscribe();
+    }
+
+    @Test
+    public void signInWithCustomToken() throws InterruptedException {
+
+        TestSubscriber<AuthResult> testSubscriber = new TestSubscriber<>();
+        rxFirebaseAuth.signInWithCustomToken(mockAuth, "token")
+                .subscribeOn(Schedulers.immediate())
+                .subscribe(testSubscriber);
+
+        testOnSuccessListener.getValue().onSuccess(mockAuthResult);
+        testOnCompleteListener.getValue().onComplete(mockAuthTask);
+
+        verify(mockAuth).signInWithCustomToken(eq("token"));
+
+        testSubscriber.assertNoErrors();
+        testSubscriber.assertValueCount(1);
+        testSubscriber.assertReceivedOnNext(Collections.singletonList(mockAuthResult));
+        testSubscriber.assertCompleted();
+        testSubscriber.unsubscribe();
+    }
+
+    @Test
+    public void testObserveAuthState() throws InterruptedException {
+
+        TestSubscriber<FirebaseUser> testSubscriber = new TestSubscriber<>();
+        rxFirebaseAuth.observeAuthState(mockAuth)
+                .subscribeOn(Schedulers.immediate())
+                .subscribe(testSubscriber);
+
+        ArgumentCaptor<FirebaseAuth.AuthStateListener> argument = ArgumentCaptor.forClass(FirebaseAuth.AuthStateListener.class);
+        verify(mockAuth).addAuthStateListener(argument.capture());
+        argument.getValue().onAuthStateChanged(mockAuth);
+
+        testSubscriber.assertNoErrors();
+        testSubscriber.assertValueCount(1);
+        testSubscriber.assertReceivedOnNext(Collections.singletonList(mockUser));
+        testSubscriber.assertNotCompleted();
+        testSubscriber.unsubscribe();
+    }
 }
