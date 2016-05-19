@@ -1,27 +1,27 @@
 {
   "project_info": {
-    "project_number": "853127749599",
-    "firebase_url": "https://crackling-fire-2497.firebaseio.com",
-    "project_id": "firebase-crackling-fire-2497",
-    "storage_bucket": "firebase-crackling-fire-2497.appspot.com"
+    "project_number": "994747794067",
+    "firebase_url": "https://project-1125675579821020265.firebaseio.com",
+    "project_id": "project-1125675579821020265",
+    "storage_bucket": "project-1125675579821020265.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:853127749599:android:df27590751f01e00",
+        "mobilesdk_app_id": "1:994747794067:android:df27590751f01e00",
         "android_client_info": {
           "package_name": "kelvinapps.com.sample"
         }
       },
       "oauth_client": [
         {
-          "client_id": "853127749599-dd8rku29sdk2a5nqflujrq519sknteto.apps.googleusercontent.com",
+          "client_id": "994747794067-sekr25nepd51af79i7m9ibc2dan44pup.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDw-0P8Fd7mRuXKRnS036MbDG2YQ0raVEE"
+          "current_key": "AIzaSyCKtEacpE9B46sTY17Rbu1lbpijODBdQms"
         }
       ],
       "services": {
