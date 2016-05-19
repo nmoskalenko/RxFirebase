@@ -66,7 +66,9 @@ or the list of values:
 ##### Gradle:
 ```groovy
 dependencies {
-  compile 'com.kelvinapps:rxfirebase:0.0.4'
+  compile 'com.google.firebase:firebase-auth:9.0.0'
+  compile 'com.google.firebase:firebase-database:9.0.0'
+  compile 'com.kelvinapps:rxfirebase:0.0.5'
 }
 ```
 
@@ -75,7 +77,7 @@ dependencies {
 <dependency>
   <groupId>com.kelvinapps</groupId>
   <artifactId>rxfirebase</artifactId>
-  <version>0.0.4</version>
+  <version>0.0.5</version>
   <type>pom</type>
 </dependency>
 ```
