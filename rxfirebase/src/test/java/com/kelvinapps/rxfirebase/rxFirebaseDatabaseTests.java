@@ -29,16 +29,19 @@ import static org.mockito.Mockito.when;
  */
 public class rxFirebaseDatabaseTests {
 
-    TestData testData = new TestData();
-    List<TestData> testDataList = new ArrayList<>();
-    rxFirebaseChildEvent<TestData> testChildEventAdded;
-    rxFirebaseChildEvent<TestData> testChildEventChanged;
-    rxFirebaseChildEvent<TestData> testChildEventRemoved;
-    rxFirebaseChildEvent<TestData> testChildEventMoved;
     @Mock
     private DatabaseReference mockDatabase;
+
     @Mock
     private DataSnapshot mockFirebaseDataSnapshot;
+
+    private TestData testData = new TestData();
+    private List<TestData> testDataList = new ArrayList<>();
+
+    private rxFirebaseChildEvent<TestData> testChildEventAdded;
+    private rxFirebaseChildEvent<TestData> testChildEventChanged;
+    private rxFirebaseChildEvent<TestData> testChildEventRemoved;
+    private rxFirebaseChildEvent<TestData> testChildEventMoved;
 
     @Before
     public void setup() {
