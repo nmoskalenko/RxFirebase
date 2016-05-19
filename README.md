@@ -23,9 +23,9 @@ According to Firebase API there are 4 different authentication methods:
 
 ```java
     rxFirebaseAuth.signInAnonymously(FirebaseAuth.getInstance())
-                .subscribe(new Action1<AuthData>() {
+                .subscribe(new Action1<AuthResult>() {
                     @Override
-                    public void call(AuthData authData) {
+                    public void call(AuthResult authData) {
                         // process with authData
                     }
                 }, new Action1<Throwable>() {
