@@ -7,21 +7,21 @@ RxJava wrapper on Google's [Firebase for Android](https://www.firebase.com/docs/
 
 
 ## Usage
-Library provides set of static methods of rxFirebase class.
+Library provides set of static methods of classes:
+- rxFirebaseAuth
+- rxFirebaseDatabase
 
 ##### Authentication:
 
 According to Firebase API there are 4 different authentication methods:
-- authAnonymously
-- authWithPassword
-- authWithOAuthToken
-- authWithCustomToken
+- signInAnonymously
+- signInWithEmailAndPassword
+- signInWithCredential
+- signInWithCustomToken
 
 
 ```java
-    Firebase firebase = new Firebase("https://docs-examples.firebaseio.com/android/saving-data/fireblog");
-
-    rxFirebase.authAnonymously(firebase)
+    rxFirebaseAuth.signInAnonymously(FirebaseAuth.getInstance())
                 .subscribe(new Action1<AuthData>() {
                     @Override
                     public void call(AuthData authData) {
@@ -35,11 +35,10 @@ According to Firebase API there are 4 different authentication methods:
                 });
 ```
 
-##### Query single value:
-You need to provide Firebase Query object and Class you are expecting in response and rxFirebase will do the rest.
-
+##### Database:
+You can query single value like:
 ```java
-    rxFirebase.observeSingleValue(firebase.child("users").child("gracehop"), User.class)
+    rxFirebaseDatabase.observeSingleValue(firebase.child("users").child("nick"), User.class)
                 .subscribe(new Action1<User>() {
                     @Override
                     public void call(User user) {
@@ -48,11 +47,10 @@ You need to provide Firebase Query object and Class you are expecting in respons
                 });
 ```
 
-##### Query values list:
-To query the list of values you need to provide Firebase Query object and Class of value.
+or the list of values:
 
 ```java
-    rxFirebase.observeValuesList(firebase.child("posts"), BlogPost.class)
+    rxFirebaseDatabase.observeValuesList(firebase.child("posts"), BlogPost.class)
                 .subscribe(new Action1<List<BlogPost>>() {
                     @Override
                     public void call(List<BlogPost> blogPosts) {
@@ -67,7 +65,7 @@ To query the list of values you need to provide Firebase Query object and Class 
 ##### Gradle:
 ```groovy
 dependencies {
-  compile 'com.kelvinapps:rxfirebase:0.0.3'
+  compile 'com.kelvinapps:rxfirebase:0.0.4'
 }
 ```
 
@@ -76,7 +74,7 @@ dependencies {
 <dependency>
   <groupId>com.kelvinapps</groupId>
   <artifactId>rxfirebase</artifactId>
-  <version>0.0.3</version>
+  <version>0.0.4</version>
   <type>pom</type>
 </dependency>
 ```
