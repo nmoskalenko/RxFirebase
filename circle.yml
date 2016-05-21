@@ -13,6 +13,6 @@ test:
   override:
     - ./gradlew clean check
     - ./gradlew assembleRelease
-    - ./gradlew test -PdisablePreDex
+    - ./gradlew jacocoTestReport -PdisablePreDex
     - cp -r rxfirebase/build/outputs $CIRCLE_ARTIFACTS
-    - cp -r rxfirebase/build/test-results/* $CIRCLE_TEST_REPORTS
+    - cp -r rxfirebase/build/reports/* $CIRCLE_TEST_REPORTS
