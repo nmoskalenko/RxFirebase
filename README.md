@@ -12,30 +12,20 @@ RxJava wrapper on Google's [Firebase for Android](https://www.firebase.com/docs/
 ## Usage
 Library provides set of static methods of classes:
 - rxFirebaseAuth
+- rxFirebaseUser
 - rxFirebaseDatabase
 
 ##### Authentication:
 
-According to Firebase API there are 4 different authentication methods:
-- signInAnonymously
-- signInWithEmailAndPassword
-- signInWithCredential
-- signInWithCustomToken
-
-
+Sign in anonymously and get token:
 ```java
-    rxFirebaseAuth.signInAnonymously(FirebaseAuth.getInstance())
-                .subscribe(new Action1<AuthResult>() {
-                    @Override
-                    public void call(AuthResult authResult) {
-                        // process with authResult
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        // process auth error
-                    }
-                });
+rxFirebaseAuth.signInAnonymously(FirebaseAuth.getInstance())
+            .flatMap(x -> rxFirebaseUser.getToken(FirebaseAuth.getInstance().getCurrentUser(), false))
+            .subscribe(token -> {
+                Log.i("rxFirebaseSample", "user token: " +  token.getToken());
+            }, throwable -> {
+                Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
+            });
 ```
 
 ##### Database:
@@ -70,7 +60,7 @@ or the list of values:
 dependencies {
   compile 'com.google.firebase:firebase-auth:9.0.0'
   compile 'com.google.firebase:firebase-database:9.0.0'
-  compile 'com.kelvinapps:rxfirebase:0.0.6'
+  compile 'com.kelvinapps:rxfirebase:0.0.7'
 }
 ```
 
@@ -79,7 +69,7 @@ dependencies {
 <dependency>
   <groupId>com.kelvinapps</groupId>
   <artifactId>rxfirebase</artifactId>
-  <version>0.0.6</version>
+  <version>0.0.7</version>
   <type>pom</type>
 </dependency>
 ```

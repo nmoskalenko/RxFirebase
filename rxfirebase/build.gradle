@@ -1,15 +1,7 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.novoda.bintray-release'
 apply plugin: 'jacoco-android'
+apply plugin: 'com.novoda.bintray-release'
 
-buildscript {
-  repositories {
-    jcenter()
-  }
-  dependencies {
-    classpath 'com.novoda:bintray-release:0.3.4'
-  }
-}
 android {
 
   packagingOptions {
@@ -24,8 +16,8 @@ android {
   defaultConfig {
     minSdkVersion 9
     targetSdkVersion 23
-    versionCode 6
-    versionName "0.0.6"
+    versionCode 7
+    versionName "0.0.7"
   }
 
   compileOptions {
@@ -70,7 +62,7 @@ publish {
   userOrg = 'kelvin'
   groupId = 'com.kelvinapps'
   artifactId = 'rxfirebase'
-  publishVersion = '0.0.6'
+  publishVersion = '0.0.7'
   desc = 'RxJava wrapper on Google Firebase for Android library'
   website = 'https://github.com/nmoskalenko/rxFirebase'
 }

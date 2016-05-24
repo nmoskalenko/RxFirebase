@@ -2,14 +2,11 @@ package com.kelvinapps.rxfirebase;
 
 import android.support.annotation.NonNull;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.ProviderQueryResult;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -26,11 +23,7 @@ public class rxFirebaseAuth {
         return Observable.create(new Observable.OnSubscribe<AuthResult>() {
             @Override
             public void call(final Subscriber<? super AuthResult> subscriber) {
-                ObservableAuthResultHandler handler = new ObservableAuthResultHandler(subscriber);
-                firebaseAuth.signInAnonymously()
-                        .addOnSuccessListener(handler)
-                        .addOnFailureListener(handler)
-                        .addOnCompleteListener(handler);
+                rxHandler.assignOnTask(subscriber, firebaseAuth.signInAnonymously());
             }
         });
     }
@@ -42,11 +35,7 @@ public class rxFirebaseAuth {
         return Observable.create(new Observable.OnSubscribe<AuthResult>() {
             @Override
             public void call(final Subscriber<? super AuthResult> subscriber) {
-                ObservableAuthResultHandler handler = new ObservableAuthResultHandler(subscriber);
-                firebaseAuth.signInWithEmailAndPassword(email, password)
-                        .addOnSuccessListener(handler)
-                        .addOnFailureListener(handler)
-                        .addOnCompleteListener(handler);
+                rxHandler.assignOnTask(subscriber, firebaseAuth.signInWithEmailAndPassword(email, password));
             }
         });
     }
@@ -57,11 +46,7 @@ public class rxFirebaseAuth {
         return Observable.create(new Observable.OnSubscribe<AuthResult>() {
             @Override
             public void call(final Subscriber<? super AuthResult> subscriber) {
-                ObservableAuthResultHandler handler = new ObservableAuthResultHandler(subscriber);
-                firebaseAuth.signInWithCredential(credential)
-                        .addOnSuccessListener(handler)
-                        .addOnFailureListener(handler)
-                        .addOnCompleteListener(handler);
+                rxHandler.assignOnTask(subscriber, firebaseAuth.signInWithCredential(credential));
             }
         });
     }
@@ -72,11 +57,41 @@ public class rxFirebaseAuth {
         return Observable.create(new Observable.OnSubscribe<AuthResult>() {
             @Override
             public void call(final Subscriber<? super AuthResult> subscriber) {
-                ObservableAuthResultHandler handler = new ObservableAuthResultHandler(subscriber);
-                firebaseAuth.signInWithCustomToken(token)
-                        .addOnSuccessListener(handler)
-                        .addOnFailureListener(handler)
-                        .addOnCompleteListener(handler);
+                rxHandler.assignOnTask(subscriber, firebaseAuth.signInWithCustomToken(token));
+            }
+        });
+    }
+
+    @NonNull
+    public static Observable<AuthResult> createUserWithEmailAndPassword(@NonNull final FirebaseAuth firebaseAuth,
+                                                                        @NonNull final String email,
+                                                                        @NonNull final String password) {
+        return Observable.create(new Observable.OnSubscribe<AuthResult>() {
+            @Override
+            public void call(final Subscriber<? super AuthResult> subscriber) {
+                rxHandler.assignOnTask(subscriber, firebaseAuth.createUserWithEmailAndPassword(email, password));
+            }
+        });
+    }
+
+    @NonNull
+    public static Observable<ProviderQueryResult> fetchProvidersForEmail(@NonNull final FirebaseAuth firebaseAuth,
+                                                                         @NonNull final String email) {
+        return Observable.create(new Observable.OnSubscribe<ProviderQueryResult>() {
+            @Override
+            public void call(final Subscriber<? super ProviderQueryResult> subscriber) {
+                rxHandler.assignOnTask(subscriber, firebaseAuth.fetchProvidersForEmail(email));
+            }
+        });
+    }
+
+    @NonNull
+    public static Observable<Void> sendPasswordResetEmail(@NonNull final FirebaseAuth firebaseAuth,
+                                                                @NonNull final String email) {
+        return Observable.create(new Observable.OnSubscribe<Void>() {
+            @Override
+            public void call(final Subscriber<? super Void> subscriber) {
+                rxHandler.assignOnTask(subscriber, firebaseAuth.sendPasswordResetEmail(email));
             }
         });
     }
@@ -105,36 +120,5 @@ public class rxFirebaseAuth {
                 }));
             }
         });
-    }
-
-    private static class ObservableAuthResultHandler
-            implements OnSuccessListener<AuthResult>, OnFailureListener, OnCompleteListener<AuthResult> {
-
-        private final Subscriber<? super AuthResult> subscriber;
-
-        private ObservableAuthResultHandler(Subscriber<? super AuthResult> observer) {
-            this.subscriber = observer;
-        }
-
-        @Override
-        public void onSuccess(AuthResult authResult) {
-            if (!subscriber.isUnsubscribed()) {
-                subscriber.onNext(authResult);
-            }
-        }
-
-        @Override
-        public void onComplete(@NonNull Task<AuthResult> task) {
-            if (!subscriber.isUnsubscribed()) {
-                subscriber.onCompleted();
-            }
-        }
-
-        @Override
-        public void onFailure(@NonNull Exception e) {
-            if (!subscriber.isUnsubscribed()) {
-                subscriber.onError(e);
-            }
-        }
     }
 }

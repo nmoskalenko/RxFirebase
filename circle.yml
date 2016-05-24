@@ -1,6 +1,6 @@
 machine:
-  environment:
-    ADB_INSTALL_TIMEOUT: "10"
+    java:
+        version: oraclejdk8
 
 dependencies:
   pre:

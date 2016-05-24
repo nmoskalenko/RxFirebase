@@ -8,6 +8,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.ProviderQueryResult;
 import com.google.firebase.database.DataSnapshot;
 
 import org.junit.Before;
@@ -37,7 +38,16 @@ public class rxFirebaseAuthTests {
     private Task<AuthResult> mockAuthTask;
 
     @Mock
+    private Task<ProviderQueryResult> mockProviderQueryResultTask;
+
+    @Mock
+    private Task<Void> mockVoidTask;
+
+    @Mock
     private AuthResult mockAuthResult;
+
+    @Mock
+    private ProviderQueryResult mockProviderQueryResult;
 
     @Mock
     private DataSnapshot mockDatabaseDataSnapshot;
@@ -48,6 +58,7 @@ public class rxFirebaseAuthTests {
     @Mock
     private FirebaseUser mockUser;
 
+    private Void mockRes = null;
 
     private ArgumentCaptor<OnCompleteListener> testOnCompleteListener;
     private ArgumentCaptor<OnSuccessListener> testOnSuccessListener;
@@ -62,16 +73,26 @@ public class rxFirebaseAuthTests {
         testOnSuccessListener = ArgumentCaptor.forClass(OnSuccessListener.class);
         testOnFailureListener = ArgumentCaptor.forClass(OnFailureListener.class);
 
-        when(mockAuthTask.addOnCompleteListener(testOnCompleteListener.capture())).thenReturn(mockAuthTask);
-        when(mockAuthTask.addOnSuccessListener(testOnSuccessListener.capture())).thenReturn(mockAuthTask);
-        when(mockAuthTask.addOnFailureListener(testOnFailureListener.capture())).thenReturn(mockAuthTask);
+        setupTask(mockAuthTask);
+        setupTask(mockProviderQueryResultTask);
+        setupTask(mockVoidTask);
 
         when(mockAuth.signInAnonymously()).thenReturn(mockAuthTask);
         when(mockAuth.signInWithEmailAndPassword("email", "password")).thenReturn(mockAuthTask);
         when(mockAuth.signInWithCredential(mockCredentials)).thenReturn(mockAuthTask);
         when(mockAuth.signInWithCustomToken("token")).thenReturn(mockAuthTask);
+        when(mockAuth.createUserWithEmailAndPassword("email", "password")).thenReturn(mockAuthTask);
+        when(mockAuth.fetchProvidersForEmail("email")).thenReturn(mockProviderQueryResultTask);
+        when(mockAuth.sendPasswordResetEmail("email")).thenReturn(mockVoidTask);
 
         when(mockAuth.getCurrentUser()).thenReturn(mockUser);
+
+    }
+
+    private <T> void setupTask(Task<T> task) {
+        when(task.addOnCompleteListener(testOnCompleteListener.capture())).thenReturn(task);
+        when(task.addOnSuccessListener(testOnSuccessListener.capture())).thenReturn(task);
+        when(task.addOnFailureListener(testOnFailureListener.capture())).thenReturn(task);
     }
 
     @Test
@@ -186,6 +207,66 @@ public class rxFirebaseAuthTests {
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
         testSubscriber.assertReceivedOnNext(Collections.singletonList(mockAuthResult));
+        testSubscriber.assertCompleted();
+        testSubscriber.unsubscribe();
+    }
+
+    @Test
+    public void createUserWithEmailAndPassword() throws InterruptedException {
+
+        TestSubscriber<AuthResult> testSubscriber = new TestSubscriber<>();
+        rxFirebaseAuth.createUserWithEmailAndPassword(mockAuth, "email", "password")
+                .subscribeOn(Schedulers.immediate())
+                .subscribe(testSubscriber);
+
+        testOnSuccessListener.getValue().onSuccess(mockAuthResult);
+        testOnCompleteListener.getValue().onComplete(mockAuthTask);
+
+        verify(mockAuth).createUserWithEmailAndPassword(eq("email"), eq("password"));
+
+        testSubscriber.assertNoErrors();
+        testSubscriber.assertValueCount(1);
+        testSubscriber.assertReceivedOnNext(Collections.singletonList(mockAuthResult));
+        testSubscriber.assertCompleted();
+        testSubscriber.unsubscribe();
+    }
+
+    @Test
+    public void fetchProvidersForEmail() throws InterruptedException {
+
+        TestSubscriber<ProviderQueryResult> testSubscriber = new TestSubscriber<>();
+        rxFirebaseAuth.fetchProvidersForEmail(mockAuth, "email")
+                .subscribeOn(Schedulers.immediate())
+                .subscribe(testSubscriber);
+
+        testOnSuccessListener.getValue().onSuccess(mockProviderQueryResult);
+        testOnCompleteListener.getValue().onComplete(mockProviderQueryResultTask);
+
+        verify(mockAuth).fetchProvidersForEmail(eq("email"));
+
+        testSubscriber.assertNoErrors();
+        testSubscriber.assertValueCount(1);
+        testSubscriber.assertReceivedOnNext(Collections.singletonList(mockProviderQueryResult));
+        testSubscriber.assertCompleted();
+        testSubscriber.unsubscribe();
+    }
+
+    @Test
+    public void sendPasswordResetEmail() throws InterruptedException {
+
+        TestSubscriber<Void> testSubscriber = new TestSubscriber<>();
+        rxFirebaseAuth.sendPasswordResetEmail(mockAuth, "email")
+                .subscribeOn(Schedulers.immediate())
+                .subscribe(testSubscriber);
+
+        testOnSuccessListener.getValue().onSuccess(mockRes);
+        testOnCompleteListener.getValue().onComplete(mockVoidTask);
+
+        verify(mockAuth).sendPasswordResetEmail(eq("email"));
+
+        testSubscriber.assertNoErrors();
+        testSubscriber.assertValueCount(1);
+        testSubscriber.assertReceivedOnNext(Collections.singletonList(mockRes));
         testSubscriber.assertCompleted();
         testSubscriber.unsubscribe();
     }
