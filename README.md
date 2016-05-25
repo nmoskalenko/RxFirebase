@@ -4,17 +4,17 @@
 [![Build Status](https://circleci.com/gh/nmoskalenko/rxFirebase/tree/master.svg?style=shield)](https://circleci.com/gh/nmoskalenko/rxFirebase/tree/master)
 [![codecov](https://codecov.io/gh/nmoskalenko/rxFirebase/branch/master/graph/badge.svg)](https://codecov.io/gh/nmoskalenko/rxFirebase)
 
-# rxFirebase
+# RxFirebase
 
 RxJava wrapper on Google's [Firebase for Android](https://www.firebase.com/docs/android/) library.
 
 
 ## Usage
 Library provides set of static methods of classes:
-- rxFirebaseAuth
-- rxFirebaseUser
-- rxFirebaseDatabase
-- rxFirebaseStorage
+- RxFirebaseAuth
+- RxFirebaseUser
+- RxFirebaseDatabase
+- RxFirebaseStorage
 
 ##### Authentication:
 
@@ -25,8 +25,9 @@ RxFirebaseAuth.signInAnonymously(FirebaseAuth.getInstance())
                 .subscribe(token -> {
                     Log.i("RxFirebaseSample", "user token: " + token.getToken());
                 }, throwable -> {
-                    Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
-                });```
+                    Log.e("RxFirebaseSample", throwable.toString());
+                });
+```
 
 ##### Database:
 You can query single value like:
@@ -35,7 +36,7 @@ RxFirebaseDatabase.observeSingleValue(reference.child("users").child("nick"), Us
             .subscribe(user -> {
                 userTextView.setText(user.toString());
             }, throwable -> {
-                Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
+                Log.e("RxFirebaseSample", throwable.toString());
             });
 ```
 
@@ -46,7 +47,7 @@ RxFirebaseDatabase.observeValuesList(reference.child("posts"), BlogPost.class)
             .subscribe(blogPosts -> {
                 postsTextView.setText(blogPosts.toString());
             }, throwable -> {
-                Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
+                Log.e("RxFirebaseSample", throwable.toString());
             });
 ```
 
@@ -58,9 +59,9 @@ Download file from Firebase storage
 StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://project-1125675579821020265.appspot.com");
 RxFirebaseStorage.getFile(storageRef.child("README.md"), targetFile)
         .subscribe(snapshot -> {
-            Log.i("rxFirebaseSample", "transferred: " + snapshot.getBytesTransferred() + " bytes");
+            Log.i("RxFirebaseSample", "transferred: " + snapshot.getBytesTransferred() + " bytes");
         }, throwable -> {
-            Log.e("rxFirebaseSample", throwable.toString());
+            Log.e("RxFirebaseSample", throwable.toString());
         });
 ```
 
@@ -69,9 +70,9 @@ or download file as bytes array
 ```java
 RxFirebaseStorage.getBytes(storageRef.child("README.md"), 1024 * 100)
                 .subscribe(bytes -> {
-                    Log.i("rxFirebaseSample", "downloaded: " + new String(bytes));
+                    Log.i("RxFirebaseSample", "downloaded: " + new String(bytes));
                 }, throwable -> {
-                    Log.e("rxFirebaseSample", throwable.toString());
+                    Log.e("RxFirebaseSample", throwable.toString());
                 });
 ```
 
@@ -83,6 +84,7 @@ RxFirebaseStorage.getBytes(storageRef.child("README.md"), 1024 * 100)
 dependencies {
   compile 'com.google.firebase:firebase-auth:9.0.0'
   compile 'com.google.firebase:firebase-database:9.0.0'
+  compile 'com.google.firebase:firebase-storage:9.0.0'
   compile 'com.kelvinapps:rxfirebase:0.0.8'
 }
 ```
