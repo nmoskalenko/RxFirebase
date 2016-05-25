@@ -184,14 +184,13 @@ public class RxFirebaseStorageTests {
                 .subscribe(testSubscriber);
 
         testOnSuccessListener.getValue().onSuccess(fileSnapshot);
-        testOnCompleteListener.getValue().onComplete(mockFileDownloadTask);
 
         verify(mockStorageRef).getFile(file);
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
         testSubscriber.assertReceivedOnNext(Collections.singletonList(fileSnapshot));
-        testSubscriber.assertCompleted();
+        testSubscriber.assertNotCompleted();
         testSubscriber.unsubscribe();
     }
 
@@ -204,14 +203,13 @@ public class RxFirebaseStorageTests {
                 .subscribe(testSubscriber);
 
         testOnSuccessListener.getValue().onSuccess(fileSnapshot);
-        testOnCompleteListener.getValue().onComplete(mockFileDownloadTask);
 
         verify(mockStorageRef).getFile(uri);
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
         testSubscriber.assertReceivedOnNext(Collections.singletonList(fileSnapshot));
-        testSubscriber.assertCompleted();
+        testSubscriber.assertNotCompleted();
         testSubscriber.unsubscribe();
     }
 
