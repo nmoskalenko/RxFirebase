@@ -9,9 +9,15 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.kelvinapps.rxfirebase.RxFirebaseAuth;
 import com.kelvinapps.rxfirebase.RxFirebaseDatabase;
+import com.kelvinapps.rxfirebase.RxFirebaseStorage;
 import com.kelvinapps.rxfirebase.RxFirebaseUser;
+
+import java.io.File;
+import java.io.IOException;
 
 public class SampleActivity extends AppCompatActivity {
 
@@ -49,5 +55,29 @@ public class SampleActivity extends AppCompatActivity {
                 }, throwable -> {
                     Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
                 });
+
+        StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://project-1125675579821020265.appspot.com");
+        RxFirebaseStorage.getBytes(storageRef.child("README.md"), 1024 * 100)
+                .subscribe(bytes -> {
+                    Log.i("rxFirebaseSample", "downloaded: " + new String(bytes));
+                }, throwable -> {
+                    Log.e("rxFirebaseSample", throwable.toString());
+                });
+
+
+        File targetFile = null;
+        try {
+            targetFile = File.createTempFile("tmp", "rx");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        RxFirebaseStorage.getFile(storageRef.child("README.md"), targetFile)
+                .subscribe(snapshot -> {
+                    Log.i("rxFirebaseSample", "transferred: " + snapshot.getBytesTransferred() + " bytes");
+                }, throwable -> {
+                    Log.e("rxFirebaseSample", throwable.toString());
+                });
+
+
     }
 }

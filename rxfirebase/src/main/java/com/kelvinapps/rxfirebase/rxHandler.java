@@ -27,6 +27,12 @@ public class RxHandler<T> implements OnSuccessListener<T>, OnFailureListener, On
                 .addOnCompleteListener(handler);
     }
 
+    public static <T> void assignOnTaskNotCompleted(Subscriber<? super T> observer, Task<T> task) {
+        RxHandler handler = new RxHandler(observer);
+        task.addOnSuccessListener(handler)
+                .addOnFailureListener(handler);
+    }
+
     @Override
     public void onSuccess(T res) {
         if (!subscriber.isUnsubscribed()) {

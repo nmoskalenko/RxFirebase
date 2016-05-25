@@ -14,6 +14,7 @@ Library provides set of static methods of classes:
 - rxFirebaseAuth
 - rxFirebaseUser
 - rxFirebaseDatabase
+- rxFirebaseStorage
 
 ##### Authentication:
 
@@ -49,6 +50,31 @@ RxFirebaseDatabase.observeValuesList(reference.child("posts"), BlogPost.class)
             });
 ```
 
+##### Storage
+
+Download file from Firebase storage
+
+```java
+StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://project-1125675579821020265.appspot.com");
+RxFirebaseStorage.getFile(storageRef.child("README.md"), targetFile)
+        .subscribe(snapshot -> {
+            Log.i("rxFirebaseSample", "transferred: " + snapshot.getBytesTransferred() + " bytes");
+        }, throwable -> {
+            Log.e("rxFirebaseSample", throwable.toString());
+        });
+```
+
+or download file as bytes array
+
+```java
+RxFirebaseStorage.getBytes(storageRef.child("README.md"), 1024 * 100)
+                .subscribe(bytes -> {
+                    Log.i("rxFirebaseSample", "downloaded: " + new String(bytes));
+                }, throwable -> {
+                    Log.e("rxFirebaseSample", throwable.toString());
+                });
+```
+
 
 ## Download
 
@@ -57,7 +83,7 @@ RxFirebaseDatabase.observeValuesList(reference.child("posts"), BlogPost.class)
 dependencies {
   compile 'com.google.firebase:firebase-auth:9.0.0'
   compile 'com.google.firebase:firebase-database:9.0.0'
-  compile 'com.kelvinapps:rxfirebase:0.0.7'
+  compile 'com.kelvinapps:rxfirebase:0.0.8'
 }
 ```
 
@@ -66,7 +92,7 @@ dependencies {
 <dependency>
   <groupId>com.kelvinapps</groupId>
   <artifactId>rxfirebase</artifactId>
-  <version>0.0.7</version>
+  <version>0.0.8</version>
   <type>pom</type>
 </dependency>
 ```
