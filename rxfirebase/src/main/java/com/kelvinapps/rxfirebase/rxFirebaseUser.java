@@ -14,7 +14,7 @@ import rx.Subscriber;
 /**
  * Created by Nick Moskalenko on 24/05/2016.
  */
-public class rxFirebaseUser {
+public class RxFirebaseUser {
 
     @NonNull
     public static Observable<GetTokenResult> getToken(@NonNull final FirebaseUser firebaseUser,
@@ -22,7 +22,7 @@ public class rxFirebaseUser {
         return Observable.create(new Observable.OnSubscribe<GetTokenResult>() {
             @Override
             public void call(final Subscriber<? super GetTokenResult> subscriber) {
-                rxHandler.assignOnTask(subscriber, firebaseUser.getToken(forceRefresh));
+                RxHandler.assignOnTask(subscriber, firebaseUser.getToken(forceRefresh));
             }
         });
     }
@@ -33,7 +33,7 @@ public class rxFirebaseUser {
         return Observable.create(new Observable.OnSubscribe<Void>() {
             @Override
             public void call(final Subscriber<? super Void> subscriber) {
-                rxHandler.assignOnTask(subscriber, firebaseUser.updateEmail(email));
+                RxHandler.assignOnTask(subscriber, firebaseUser.updateEmail(email));
             }
         });
     }
@@ -44,7 +44,7 @@ public class rxFirebaseUser {
         return Observable.create(new Observable.OnSubscribe<Void>() {
             @Override
             public void call(final Subscriber<? super Void> subscriber) {
-                rxHandler.assignOnTask(subscriber, firebaseUser.updatePassword(password));
+                RxHandler.assignOnTask(subscriber, firebaseUser.updatePassword(password));
             }
         });
     }
@@ -55,7 +55,7 @@ public class rxFirebaseUser {
         return Observable.create(new Observable.OnSubscribe<Void>() {
             @Override
             public void call(final Subscriber<? super Void> subscriber) {
-                rxHandler.assignOnTask(subscriber, firebaseUser.updateProfile(request));
+                RxHandler.assignOnTask(subscriber, firebaseUser.updateProfile(request));
             }
         });
     }
@@ -65,7 +65,7 @@ public class rxFirebaseUser {
         return Observable.create(new Observable.OnSubscribe<Void>() {
             @Override
             public void call(final Subscriber<? super Void> subscriber) {
-                rxHandler.assignOnTask(subscriber, firebaseUser.delete());
+                RxHandler.assignOnTask(subscriber, firebaseUser.delete());
             }
         });
     }
@@ -76,7 +76,7 @@ public class rxFirebaseUser {
         return Observable.create(new Observable.OnSubscribe<Void>() {
             @Override
             public void call(final Subscriber<? super Void> subscriber) {
-                rxHandler.assignOnTask(subscriber, firebaseUser.reauthenticate(credential));
+                RxHandler.assignOnTask(subscriber, firebaseUser.reauthenticate(credential));
             }
         });
     }
@@ -87,7 +87,7 @@ public class rxFirebaseUser {
         return Observable.create(new Observable.OnSubscribe<AuthResult>() {
             @Override
             public void call(final Subscriber<? super AuthResult> subscriber) {
-                rxHandler.assignOnTask(subscriber, firebaseUser.linkWithCredential(credential));
+                RxHandler.assignOnTask(subscriber, firebaseUser.linkWithCredential(credential));
             }
         });
     }

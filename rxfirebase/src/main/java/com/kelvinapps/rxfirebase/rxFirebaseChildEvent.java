@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 /**
  * Created by Nick Moskalenko on 17/05/2016.
  */
-public class rxFirebaseChildEvent<T> {
+public class RxFirebaseChildEvent<T> {
 
 
     public enum EventType {
@@ -20,7 +20,7 @@ public class rxFirebaseChildEvent<T> {
     private String previousChildName;
 
 
-    public rxFirebaseChildEvent(@NonNull T data,
+    public RxFirebaseChildEvent(@NonNull T data,
                                 @NonNull String previousChildName,
                                 @NonNull EventType eventType) {
         this.value = data;
@@ -28,7 +28,7 @@ public class rxFirebaseChildEvent<T> {
         this.eventType = eventType;
     }
 
-    public rxFirebaseChildEvent(@NonNull T data, @NonNull EventType eventType) {
+    public RxFirebaseChildEvent(@NonNull T data, @NonNull EventType eventType) {
         this.value = data;
         this.eventType = eventType;
     }
@@ -66,7 +66,7 @@ public class rxFirebaseChildEvent<T> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        rxFirebaseChildEvent<?> that = (rxFirebaseChildEvent<?>) o;
+        RxFirebaseChildEvent<?> that = (RxFirebaseChildEvent<?>) o;
 
         if (eventType != that.eventType) return false;
         if (value != null ? !value.equals(that.value) : that.value != null) return false;

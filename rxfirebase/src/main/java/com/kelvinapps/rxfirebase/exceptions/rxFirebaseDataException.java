@@ -7,11 +7,11 @@ import com.google.firebase.database.DatabaseError;
 /**
  * Created by Nick Moskalenko on 16/05/2016.
  */
-public class rxFirebaseDataException extends Exception {
+public class RxFirebaseDataException extends Exception {
 
     protected DatabaseError error;
 
-    public rxFirebaseDataException(@NonNull DatabaseError error) {
+    public RxFirebaseDataException(@NonNull DatabaseError error) {
         this.error = error;
     }
 
@@ -21,7 +21,7 @@ public class rxFirebaseDataException extends Exception {
 
     @Override
     public String toString() {
-        return "rxFirebaseDataException{" +
+        return "RxFirebaseDataException{" +
                 "error=" + error +
                 '}';
     }

@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by Nick Moskalenko on 24/05/2016.
  */
-public class rxFirebaseUserTests {
+public class RxFirebaseUserTests {
 
     @Mock
     private FirebaseUser mockUser;
@@ -95,7 +95,7 @@ public class rxFirebaseUserTests {
     public void getToken() throws InterruptedException {
 
         TestSubscriber<GetTokenResult> testSubscriber = new TestSubscriber<>();
-        rxFirebaseUser.getToken(mockUser, true)
+        RxFirebaseUser.getToken(mockUser, true)
                 .subscribeOn(Schedulers.immediate())
                 .subscribe(testSubscriber);
 
@@ -115,7 +115,7 @@ public class rxFirebaseUserTests {
     public void updateEmail() throws InterruptedException {
 
         TestSubscriber<Void> testSubscriber = new TestSubscriber<>();
-        rxFirebaseUser.updateEmail(mockUser, "newemail")
+        RxFirebaseUser.updateEmail(mockUser, "newemail")
                 .subscribeOn(Schedulers.immediate())
                 .subscribe(testSubscriber);
 
@@ -135,7 +135,7 @@ public class rxFirebaseUserTests {
     public void updatePassword() throws InterruptedException {
 
         TestSubscriber<Void> testSubscriber = new TestSubscriber<>();
-        rxFirebaseUser.updatePassword(mockUser, "password")
+        RxFirebaseUser.updatePassword(mockUser, "password")
                 .subscribeOn(Schedulers.immediate())
                 .subscribe(testSubscriber);
 
@@ -155,7 +155,7 @@ public class rxFirebaseUserTests {
     public void updateProfile() throws InterruptedException {
 
         TestSubscriber<Void> testSubscriber = new TestSubscriber<>();
-        rxFirebaseUser.updateProfile(mockUser, userProfileChangeRequest)
+        RxFirebaseUser.updateProfile(mockUser, userProfileChangeRequest)
                 .subscribeOn(Schedulers.immediate())
                 .subscribe(testSubscriber);
 
@@ -175,7 +175,7 @@ public class rxFirebaseUserTests {
     public void delete() throws InterruptedException {
 
         TestSubscriber<Void> testSubscriber = new TestSubscriber<>();
-        rxFirebaseUser.delete(mockUser)
+        RxFirebaseUser.delete(mockUser)
                 .subscribeOn(Schedulers.immediate())
                 .subscribe(testSubscriber);
 
@@ -195,7 +195,7 @@ public class rxFirebaseUserTests {
     public void reauthenticate() throws InterruptedException {
 
         TestSubscriber<Void> testSubscriber = new TestSubscriber<>();
-        rxFirebaseUser.reauthenticate(mockUser, credential)
+        RxFirebaseUser.reauthenticate(mockUser, credential)
                 .subscribeOn(Schedulers.immediate())
                 .subscribe(testSubscriber);
 
@@ -215,7 +215,7 @@ public class rxFirebaseUserTests {
     public void linkWithCredential() throws InterruptedException {
 
         TestSubscriber<AuthResult> testSubscriber = new TestSubscriber<>();
-        rxFirebaseUser.linkWithCredential(mockUser, credential)
+        RxFirebaseUser.linkWithCredential(mockUser, credential)
                 .subscribeOn(Schedulers.immediate())
                 .subscribe(testSubscriber);
 

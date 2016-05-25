@@ -19,37 +19,34 @@ Library provides set of static methods of classes:
 
 Sign in anonymously and get token:
 ```java
-rxFirebaseAuth.signInAnonymously(FirebaseAuth.getInstance())
-            .flatMap(x -> rxFirebaseUser.getToken(FirebaseAuth.getInstance().getCurrentUser(), false))
-            .subscribe(token -> {
-                Log.i("rxFirebaseSample", "user token: " +  token.getToken());
+RxFirebaseAuth.signInAnonymously(FirebaseAuth.getInstance())
+                .flatMap(x -> RxFirebaseUser.getToken(FirebaseAuth.getInstance().getCurrentUser(), false))
+                .subscribe(token -> {
+                    Log.i("RxFirebaseSample", "user token: " + token.getToken());
+                }, throwable -> {
+                    Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
+                });```
+
+##### Database:
+You can query single value like:
+```java
+RxFirebaseDatabase.observeSingleValue(reference.child("users").child("nick"), User.class)
+            .subscribe(user -> {
+                userTextView.setText(user.toString());
             }, throwable -> {
                 Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
             });
 ```
 
-##### Database:
-You can query single value like:
-```java
-    rxFirebaseDatabase.observeSingleValue(firebase.child("users").child("nick"), User.class)
-                .subscribe(new Action1<User>() {
-                    @Override
-                    public void call(User user) {
-                        // process User value
-                    }
-                });
-```
-
 or the list of values:
 
 ```java
-    rxFirebaseDatabase.observeValuesList(firebase.child("posts"), BlogPost.class)
-                .subscribe(new Action1<List<BlogPost>>() {
-                    @Override
-                    public void call(List<BlogPost> blogPosts) {
-                        // process blogPosts collection
-                    }
-                });
+RxFirebaseDatabase.observeValuesList(reference.child("posts"), BlogPost.class)
+            .subscribe(blogPosts -> {
+                postsTextView.setText(blogPosts.toString());
+            }, throwable -> {
+                Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
+            });
 ```
 
 

@@ -12,16 +12,16 @@ import rx.Subscriber;
 /**
  * Created by Nick Moskalenko on 24/05/2016.
  */
-public class rxHandler<T> implements OnSuccessListener<T>, OnFailureListener, OnCompleteListener<T> {
+public class RxHandler<T> implements OnSuccessListener<T>, OnFailureListener, OnCompleteListener<T> {
 
     private final Subscriber<? super T> subscriber;
 
-    private rxHandler(Subscriber<? super T> observer) {
+    private RxHandler(Subscriber<? super T> observer) {
         this.subscriber = observer;
     }
 
     public static <T> void assignOnTask(Subscriber<? super T> observer, Task<T> task) {
-        rxHandler handler = new rxHandler(observer);
+        RxHandler handler = new RxHandler(observer);
         task.addOnSuccessListener(handler)
                 .addOnFailureListener(handler)
                 .addOnCompleteListener(handler);
