@@ -16,7 +16,9 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
@@ -37,6 +39,7 @@ public class RxFirebaseDatabaseTests {
 
     private TestData testData = new TestData();
     private List<TestData> testDataList = new ArrayList<>();
+    private Map<String, TestData> testDataMap = new HashMap<>();
 
     private RxFirebaseChildEvent<TestData> testChildEventAdded;
     private RxFirebaseChildEvent<TestData> testChildEventChanged;
@@ -48,12 +51,14 @@ public class RxFirebaseDatabaseTests {
         MockitoAnnotations.initMocks(this);
 
         testDataList.add(testData);
+        testDataMap.put("key", testData);
         testChildEventAdded = new RxFirebaseChildEvent<>(testData, "root", RxFirebaseChildEvent.EventType.ADDED);
         testChildEventChanged = new RxFirebaseChildEvent<>(testData, "root", RxFirebaseChildEvent.EventType.CHANGED);
         testChildEventRemoved = new RxFirebaseChildEvent<>(testData, RxFirebaseChildEvent.EventType.REMOVED);
         testChildEventMoved = new RxFirebaseChildEvent<>(testData, "root", RxFirebaseChildEvent.EventType.MOVED);
 
         when(mockFirebaseDataSnapshot.getValue(TestData.class)).thenReturn(testData);
+        when(mockFirebaseDataSnapshot.getKey()).thenReturn("key");
         when(mockFirebaseDataSnapshot.getChildren()).thenReturn(Arrays.asList(mockFirebaseDataSnapshot));
     }
 
@@ -125,6 +130,25 @@ public class RxFirebaseDatabaseTests {
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
         testSubscriber.assertReceivedOnNext(Collections.singletonList(testDataList));
+        testSubscriber.assertCompleted();
+        testSubscriber.unsubscribe();
+    }
+
+    @Test
+    public void testObserveValuesMap() throws InterruptedException {
+
+        TestSubscriber<Map<String, TestData>> testSubscriber = new TestSubscriber<>();
+        RxFirebaseDatabase.observeValuesMap(mockDatabase, TestData.class)
+                .subscribeOn(Schedulers.immediate())
+                .subscribe(testSubscriber);
+
+        ArgumentCaptor<ValueEventListener> argument = ArgumentCaptor.forClass(ValueEventListener.class);
+        verify(mockDatabase).addListenerForSingleValueEvent(argument.capture());
+        argument.getValue().onDataChange(mockFirebaseDataSnapshot);
+
+        testSubscriber.assertNoErrors();
+        testSubscriber.assertValueCount(1);
+        testSubscriber.assertReceivedOnNext(Collections.singletonList(testDataMap));
         testSubscriber.assertCompleted();
         testSubscriber.unsubscribe();
     }
