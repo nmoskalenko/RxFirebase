@@ -41,9 +41,9 @@ public class SampleActivity extends AppCompatActivity {
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         // observe posts list under "posts" child.
-        RxFirebaseDatabase.observeValuesList(reference.child("posts"), BlogPost.class)
-                .subscribe(blogPosts -> {
-                    postsTextView.setText(blogPosts.toString());
+        RxFirebaseDatabase.observeValues(reference.child("posts"), BlogPost.class)
+                .subscribe(blogPost -> {
+                    postsTextView.setText(postsTextView.getText().toString() + blogPost.toString());
                 }, throwable -> {
                     Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
                 });

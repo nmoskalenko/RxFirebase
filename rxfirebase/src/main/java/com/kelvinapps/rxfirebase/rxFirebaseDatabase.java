@@ -62,6 +62,43 @@ public class RxFirebaseDatabase {
     }
 
     @NonNull
+    public static <T> Observable<T> observeValues(@NonNull final Query query, @NonNull final Class<T> clazz) {
+        return Observable.create(new Observable.OnSubscribe<T>() {
+            @Override
+            public void call(final Subscriber<? super T> subscriber) {
+                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                            T value = childSnapshot.getValue(clazz);
+                            if (value == null) {
+                                if (!subscriber.isUnsubscribed()) {
+                                    subscriber.onError(new RxFirebaseDataCastException("unable to cast firebase data response to " + clazz.getSimpleName()));
+                                }
+                            } else {
+                                if (!subscriber.isUnsubscribed()) {
+                                    subscriber.onNext(value);
+                                }
+                            }
+                        }
+                        if (!subscriber.isUnsubscribed()) {
+                            subscriber.onCompleted();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                        if (!subscriber.isUnsubscribed()) {
+                            subscriber.onError(new RxFirebaseDataException(error));
+                        }
+                    }
+                });
+            }
+
+        });
+    }
+
+    @NonNull
     public static <T> Observable<List<T>> observeValuesList(@NonNull final Query query, @NonNull final Class<T> clazz) {
         return Observable.create(new Observable.OnSubscribe<List<T>>() {
             @Override

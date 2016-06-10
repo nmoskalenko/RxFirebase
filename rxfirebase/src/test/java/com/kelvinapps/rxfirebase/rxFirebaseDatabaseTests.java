@@ -116,6 +116,25 @@ public class RxFirebaseDatabaseTests {
     }
 
     @Test
+    public void testObserveValues() throws InterruptedException {
+
+        TestSubscriber<TestData> testSubscriber = new TestSubscriber<>();
+        RxFirebaseDatabase.observeValues(mockDatabase, TestData.class)
+                .subscribeOn(Schedulers.immediate())
+                .subscribe(testSubscriber);
+
+        ArgumentCaptor<ValueEventListener> argument = ArgumentCaptor.forClass(ValueEventListener.class);
+        verify(mockDatabase).addListenerForSingleValueEvent(argument.capture());
+        argument.getValue().onDataChange(mockFirebaseDataSnapshot);
+
+        testSubscriber.assertNoErrors();
+        testSubscriber.assertValueCount(1);
+        testSubscriber.assertReceivedOnNext(Collections.singletonList(testData));
+        testSubscriber.assertCompleted();
+        testSubscriber.unsubscribe();
+    }
+
+    @Test
     public void testObserveValuesList() throws InterruptedException {
 
         TestSubscriber<List<TestData>> testSubscriber = new TestSubscriber<>();
