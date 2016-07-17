@@ -138,9 +138,9 @@ public class RxFirebaseDatabase {
 
     @NonNull
     public static <T> Observable<LinkedHashMap<String, T>> observeValuesMap(@NonNull final Query query, @NonNull final Class<T> clazz) {
-        return Observable.create(new Observable.OnSubscribe<Map<String, T>>() {
+        return Observable.create(new Observable.OnSubscribe<LinkedHashMap<String, T>>() {
             @Override
-            public void call(final Subscriber<? super Map<String, T>> subscriber) {
+            public void call(final Subscriber<? super LinkedHashMap<String, T>> subscriber) {
                 query.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
