@@ -1,7 +1,6 @@
 package com.kelvinapps.rxfirebase;
 
 import android.support.annotation.NonNull;
-
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -9,12 +8,9 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.kelvinapps.rxfirebase.exceptions.RxFirebaseDataCastException;
 import com.kelvinapps.rxfirebase.exceptions.RxFirebaseDataException;
-
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action0;
@@ -175,12 +171,12 @@ public class RxFirebaseDatabase {
     }
 
     @NonNull
-    public static <T> Observable<RxFirebaseChildEvent<T>> observeChildrenEvents(@NonNull final Query ref, @NonNull final Class<T> clazz) {
+    public static <T> Observable<RxFirebaseChildEvent<T>> observeChildrenEvents(@NonNull final Query query, @NonNull final Class<T> clazz) {
         return Observable.create(new Observable.OnSubscribe<RxFirebaseChildEvent<T>>() {
             @Override
             public void call(final Subscriber<? super RxFirebaseChildEvent<T>> subscriber) {
                 final ChildEventListener childEventListener =
-                        ref.addChildEventListener(new ChildEventListener() {
+                        query.addChildEventListener(new ChildEventListener() {
 
                             @Override
                             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
@@ -232,7 +228,7 @@ public class RxFirebaseDatabase {
                 subscriber.add(Subscriptions.create(new Action0() {
                     @Override
                     public void call() {
-                        ref.removeEventListener(childEventListener);
+                        query.removeEventListener(childEventListener);
                     }
                 }));
             }
