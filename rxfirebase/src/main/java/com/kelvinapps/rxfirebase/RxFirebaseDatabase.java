@@ -11,9 +11,8 @@ import com.kelvinapps.rxfirebase.exceptions.RxFirebaseDataCastException;
 import com.kelvinapps.rxfirebase.exceptions.RxFirebaseDataException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -57,6 +56,45 @@ public class RxFirebaseDatabase {
                     }
                 });
 
+            }
+        });
+    }
+
+    @NonNull
+    public static <T> Observable<T> observeValue(@NonNull final Query query, @NonNull final Class<T> clazz) {
+        return Observable.create(new Observable.OnSubscribe<T>() {
+            @Override
+            public void call(final Subscriber<? super T> subscriber) {
+                final ValueEventListener valueEventListener = query.addValueEventListener(
+                        new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                T value = dataSnapshot.getValue(clazz);
+                                if (value != null) {
+                                    if (!subscriber.isUnsubscribed()) {
+                                        subscriber.onNext(value);
+                                    }
+                                } else {
+                                    if (!subscriber.isUnsubscribed()) {
+                                        subscriber.onError(new RxFirebaseDataCastException("unable to cast firebase data response to " + clazz.getSimpleName()));
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError error) {
+                                if (!subscriber.isUnsubscribed()) {
+                                    subscriber.onError(new RxFirebaseDataException(error));
+                                }
+                            }
+                        });
+
+                subscriber.add(Subscriptions.create(new Action0() {
+                    @Override
+                    public void call() {
+                        query.removeEventListener(valueEventListener);
+                    }
+                }));
             }
         });
     }
@@ -175,12 +213,12 @@ public class RxFirebaseDatabase {
     }
 
     @NonNull
-    public static <T> Observable<RxFirebaseChildEvent<T>> observeChildrenEvents(@NonNull final Query ref, @NonNull final Class<T> clazz) {
+    public static <T> Observable<RxFirebaseChildEvent<T>> observeChildrenEvents(@NonNull final Query query, @NonNull final Class<T> clazz) {
         return Observable.create(new Observable.OnSubscribe<RxFirebaseChildEvent<T>>() {
             @Override
             public void call(final Subscriber<? super RxFirebaseChildEvent<T>> subscriber) {
                 final ChildEventListener childEventListener =
-                        ref.addChildEventListener(new ChildEventListener() {
+                        query.addChildEventListener(new ChildEventListener() {
 
                             @Override
                             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
@@ -232,7 +270,7 @@ public class RxFirebaseDatabase {
                 subscriber.add(Subscriptions.create(new Action0() {
                     @Override
                     public void call() {
-                        ref.removeEventListener(childEventListener);
+                        query.removeEventListener(childEventListener);
                     }
                 }));
             }
