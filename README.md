@@ -85,7 +85,7 @@ dependencies {
   compile 'com.google.firebase:firebase-auth:9.0.0'
   compile 'com.google.firebase:firebase-database:9.0.0'
   compile 'com.google.firebase:firebase-storage:9.0.0'
-  compile 'com.kelvinapps:rxfirebase:0.0.10'
+  compile 'com.kelvinapps:rxfirebase:0.0.11'
 }
 ```
 
@@ -94,7 +94,7 @@ dependencies {
 <dependency>
   <groupId>com.kelvinapps</groupId>
   <artifactId>rxfirebase</artifactId>
-  <version>0.0.10</version>
+  <version>0.0.11</version>
   <type>pom</type>
 </dependency>
 ```
