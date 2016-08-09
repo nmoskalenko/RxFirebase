@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
  */
 public class RxFirebaseChildEvent<T> {
 
-
     public enum EventType {
         ADDED,
         CHANGED,
