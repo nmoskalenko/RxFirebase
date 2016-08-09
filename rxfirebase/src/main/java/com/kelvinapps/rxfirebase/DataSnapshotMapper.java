@@ -12,6 +12,9 @@ import rx.functions.Func1;
 
 public abstract class DataSnapshotMapper<T, U> implements Func1<T, U> {
 
+    private DataSnapshotMapper() {
+    }
+
     public static <U> DataSnapshotMapper<DataSnapshot, U> of(Class<U> clazz) {
         return new TypedDataSnapshotMapper<U>(clazz);
     }
