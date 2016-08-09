@@ -11,6 +11,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.kelvinapps.rxfirebase.DataSnapshotMapper;
 import com.kelvinapps.rxfirebase.RxFirebaseAuth;
 import com.kelvinapps.rxfirebase.RxFirebaseDatabase;
 import com.kelvinapps.rxfirebase.RxFirebaseStorage;
@@ -41,7 +42,7 @@ public class SampleActivity extends AppCompatActivity {
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         // observe posts list under "posts" child.
-        RxFirebaseDatabase.observeValues(reference.child("posts"), BlogPost.class)
+        RxFirebaseDatabase.observeValueEvent(reference.child("posts"), BlogPost.class)
                 .subscribe(blogPost -> {
                     postsTextView.setText(postsTextView.getText().toString() + blogPost.toString());
                 }, throwable -> {
@@ -49,7 +50,7 @@ public class SampleActivity extends AppCompatActivity {
                 });
 
         // observe single user "nick"
-        RxFirebaseDatabase.observeSingleValue(reference.child("users").child("nick"), User.class)
+        RxFirebaseDatabase.observeSingleValueEvent(reference.child("users").child("nick"), User.class)
                 .subscribe(user -> {
                     userTextView.setText(user.toString());
                 }, throwable -> {
