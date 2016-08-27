@@ -24,7 +24,7 @@ public abstract class DataSnapshotMapper<T, U> implements Func1<T, U> {
         return new GenericTypedDataSnapshotMapper<U>(genericTypeIndicator);
     }
 
-    public static <U> DataSnapshotMapper<RxFirebaseChildEvent<DataSnapshot>, RxFirebaseChildEvent<U>> ofChild(Class<U> clazz) {
+    public static <U> DataSnapshotMapper<RxFirebaseChildEvent<DataSnapshot>, RxFirebaseChildEvent<U>> ofChildEvent(Class<U> clazz) {
         return new ChildEventDataSnapshotMapper<U>(clazz);
     }
 
