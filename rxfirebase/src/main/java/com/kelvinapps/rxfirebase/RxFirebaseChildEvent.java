@@ -7,19 +7,9 @@ import android.support.annotation.NonNull;
  */
 public class RxFirebaseChildEvent<T> {
 
-
-    public enum EventType {
-        ADDED,
-        CHANGED,
-        REMOVED,
-        MOVED
-    }
-
     private EventType eventType;
     private T value;
     private String previousChildName;
-
-
     public RxFirebaseChildEvent(@NonNull T data,
                                 @NonNull String previousChildName,
                                 @NonNull EventType eventType) {
@@ -27,6 +17,7 @@ public class RxFirebaseChildEvent<T> {
         this.previousChildName = previousChildName;
         this.eventType = eventType;
     }
+
 
     public RxFirebaseChildEvent(@NonNull T data, @NonNull EventType eventType) {
         this.value = data;
@@ -60,7 +51,6 @@ public class RxFirebaseChildEvent<T> {
         this.eventType = eventType;
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -80,5 +70,12 @@ public class RxFirebaseChildEvent<T> {
         result = 31 * result + (value != null ? value.hashCode() : 0);
         result = 31 * result + (previousChildName != null ? previousChildName.hashCode() : 0);
         return result;
+    }
+
+    public enum EventType {
+        ADDED,
+        CHANGED,
+        REMOVED,
+        MOVED
     }
 }

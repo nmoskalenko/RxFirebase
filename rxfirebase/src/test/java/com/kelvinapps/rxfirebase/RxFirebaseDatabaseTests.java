@@ -17,9 +17,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import rx.functions.Func0;
+import rx.functions.Func1;
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
 
@@ -57,6 +60,7 @@ public class RxFirebaseDatabaseTests {
         testChildEventRemoved = new RxFirebaseChildEvent<>(testData, RxFirebaseChildEvent.EventType.REMOVED);
         testChildEventMoved = new RxFirebaseChildEvent<>(testData, "root", RxFirebaseChildEvent.EventType.MOVED);
 
+        when(mockFirebaseDataSnapshot.exists()).thenReturn(true);
         when(mockFirebaseDataSnapshot.getValue(TestData.class)).thenReturn(testData);
         when(mockFirebaseDataSnapshot.getKey()).thenReturn("key");
         when(mockFirebaseDataSnapshot.getChildren()).thenReturn(Arrays.asList(mockFirebaseDataSnapshot));
@@ -66,7 +70,7 @@ public class RxFirebaseDatabaseTests {
     public void testObserveSingleValue() throws InterruptedException {
 
         TestSubscriber<TestData> testSubscriber = new TestSubscriber<>();
-        RxFirebaseDatabase.observeSingleValue(mockDatabase, TestData.class)
+        RxFirebaseDatabase.observeSingleValueEvent(mockDatabase, TestData.class)
                 .subscribeOn(Schedulers.immediate())
                 .subscribe(testSubscriber);
 
@@ -85,13 +89,13 @@ public class RxFirebaseDatabaseTests {
     public void testObserveSingleValue_Disconnected() throws InterruptedException {
 
         TestSubscriber<TestData> testSubscriber = new TestSubscriber<>();
-        RxFirebaseDatabase.observeSingleValue(mockDatabase, TestData.class)
+        RxFirebaseDatabase.observeSingleValueEvent(mockDatabase, TestData.class)
                 .subscribeOn(Schedulers.immediate())
                 .subscribe(testSubscriber);
 
         ArgumentCaptor<ValueEventListener> argument = ArgumentCaptor.forClass(ValueEventListener.class);
         verify(mockDatabase).addListenerForSingleValueEvent(argument.capture());
-        argument.getValue().onCancelled(DatabaseError.zznw(DatabaseError.DISCONNECTED));
+        argument.getValue().onCancelled(DatabaseError.zzadi(DatabaseError.DISCONNECTED));
 
         testSubscriber.assertError(RxFirebaseDataException.class);
         testSubscriber.assertNotCompleted();
@@ -99,16 +103,17 @@ public class RxFirebaseDatabaseTests {
     }
 
     @Test
-    public void testObserveValuesList_Failed() throws InterruptedException {
+    public void testObserveSingleValueEvent_Failed() throws InterruptedException {
 
         TestSubscriber<List<TestData>> testSubscriber = new TestSubscriber<>();
-        RxFirebaseDatabase.observeValuesList(mockDatabase, TestData.class)
+        RxFirebaseDatabase.observeSingleValueEvent(mockDatabase, TestData.class)
                 .subscribeOn(Schedulers.immediate())
+                .toList()
                 .subscribe(testSubscriber);
 
         ArgumentCaptor<ValueEventListener> argument = ArgumentCaptor.forClass(ValueEventListener.class);
         verify(mockDatabase).addListenerForSingleValueEvent(argument.capture());
-        argument.getValue().onCancelled(DatabaseError.zznw(DatabaseError.OPERATION_FAILED));
+        argument.getValue().onCancelled(DatabaseError.zzadi(DatabaseError.OPERATION_FAILED));
 
         testSubscriber.assertError(RxFirebaseDataException.class);
         testSubscriber.assertNotCompleted();
@@ -116,10 +121,10 @@ public class RxFirebaseDatabaseTests {
     }
 
     @Test
-    public void testObserveValue() throws InterruptedException {
+    public void testObserveValueEvent() throws InterruptedException {
 
         TestSubscriber<TestData> testSubscriber = new TestSubscriber<>();
-        RxFirebaseDatabase.observeValue(mockDatabase, TestData.class)
+        RxFirebaseDatabase.observeValueEvent(mockDatabase, TestData.class)
                 .subscribeOn(Schedulers.immediate())
                 .subscribe(testSubscriber);
 
@@ -135,10 +140,10 @@ public class RxFirebaseDatabaseTests {
     }
 
     @Test
-    public void testObserveValues() throws InterruptedException {
+    public void testSingleValueEvent() throws InterruptedException {
 
         TestSubscriber<TestData> testSubscriber = new TestSubscriber<>();
-        RxFirebaseDatabase.observeValues(mockDatabase, TestData.class)
+        RxFirebaseDatabase.observeSingleValueEvent(mockDatabase, TestData.class)
                 .subscribeOn(Schedulers.immediate())
                 .subscribe(testSubscriber);
 
@@ -154,11 +159,12 @@ public class RxFirebaseDatabaseTests {
     }
 
     @Test
-    public void testObserveValuesList() throws InterruptedException {
+    public void testObserveValueEventList() throws InterruptedException {
 
         TestSubscriber<List<TestData>> testSubscriber = new TestSubscriber<>();
-        RxFirebaseDatabase.observeValuesList(mockDatabase, TestData.class)
+        RxFirebaseDatabase.observeSingleValueEvent(mockDatabase, TestData.class)
                 .subscribeOn(Schedulers.immediate())
+                .toList()
                 .subscribe(testSubscriber);
 
         ArgumentCaptor<ValueEventListener> argument = ArgumentCaptor.forClass(ValueEventListener.class);
@@ -176,8 +182,24 @@ public class RxFirebaseDatabaseTests {
     public void testObserveValuesMap() throws InterruptedException {
 
         TestSubscriber<Map<String, TestData>> testSubscriber = new TestSubscriber<>();
-        RxFirebaseDatabase.observeValuesMap(mockDatabase, TestData.class)
+        RxFirebaseDatabase.observeSingleValueEvent(mockDatabase)
                 .subscribeOn(Schedulers.immediate())
+                .toMap(new Func1<DataSnapshot, String>() {
+                    @Override
+                    public String call(DataSnapshot dataSnapshot) {
+                        return dataSnapshot.getKey();
+                    }
+                }, new Func1<DataSnapshot, TestData>() {
+                    @Override
+                    public TestData call(DataSnapshot dataSnapshot) {
+                        return dataSnapshot.getValue(TestData.class);
+                    }
+                }, new Func0<Map<String, TestData>>() {
+                    @Override
+                    public Map<String, TestData> call() {
+                        return new LinkedHashMap<String, TestData>();
+                    }
+                })
                 .subscribe(testSubscriber);
 
         ArgumentCaptor<ValueEventListener> argument = ArgumentCaptor.forClass(ValueEventListener.class);
@@ -192,10 +214,10 @@ public class RxFirebaseDatabaseTests {
     }
 
     @Test
-    public void testObserveChildrenEvents_Added() throws InterruptedException {
+    public void testObserveChildEvent_Added() throws InterruptedException {
 
         TestSubscriber<RxFirebaseChildEvent<TestData>> testSubscriber = new TestSubscriber<>();
-        RxFirebaseDatabase.observeChildrenEvents(mockDatabase, TestData.class)
+        RxFirebaseDatabase.observeChildEvent(mockDatabase, TestData.class)
                 .subscribeOn(Schedulers.immediate())
                 .subscribe(testSubscriber);
 
@@ -211,10 +233,10 @@ public class RxFirebaseDatabaseTests {
     }
 
     @Test
-    public void testObserveChildrenEvents_Changed() throws InterruptedException {
+    public void testObserveChildEvent_Changed() throws InterruptedException {
 
         TestSubscriber<RxFirebaseChildEvent<TestData>> testSubscriber = new TestSubscriber<>();
-        RxFirebaseDatabase.observeChildrenEvents(mockDatabase, TestData.class)
+        RxFirebaseDatabase.observeChildEvent(mockDatabase, TestData.class)
                 .subscribeOn(Schedulers.immediate())
                 .subscribe(testSubscriber);
 
@@ -230,10 +252,10 @@ public class RxFirebaseDatabaseTests {
     }
 
     @Test
-    public void testObserveChildrenEvents_Removed() throws InterruptedException {
+    public void testObserveChildEvent_Removed() throws InterruptedException {
 
         TestSubscriber<RxFirebaseChildEvent<TestData>> testSubscriber = new TestSubscriber<>();
-        RxFirebaseDatabase.observeChildrenEvents(mockDatabase, TestData.class)
+        RxFirebaseDatabase.observeChildEvent(mockDatabase, TestData.class)
                 .subscribeOn(Schedulers.immediate())
                 .subscribe(testSubscriber);
 
@@ -249,10 +271,10 @@ public class RxFirebaseDatabaseTests {
     }
 
     @Test
-    public void testObserveChildrenEvents_Moved() throws InterruptedException {
+    public void testObserveChildEvent_Moved() throws InterruptedException {
 
         TestSubscriber<RxFirebaseChildEvent<TestData>> testSubscriber = new TestSubscriber<>();
-        RxFirebaseDatabase.observeChildrenEvents(mockDatabase, TestData.class)
+        RxFirebaseDatabase.observeChildEvent(mockDatabase, TestData.class)
                 .subscribeOn(Schedulers.immediate())
                 .subscribe(testSubscriber);
 
@@ -268,16 +290,16 @@ public class RxFirebaseDatabaseTests {
     }
 
     @Test
-    public void testObserveChildrenEvents_Cancelled() throws InterruptedException {
+    public void testObserveChildEvent_Cancelled() throws InterruptedException {
 
         TestSubscriber<RxFirebaseChildEvent<TestData>> testSubscriber = new TestSubscriber<>();
-        RxFirebaseDatabase.observeChildrenEvents(mockDatabase, TestData.class)
+        RxFirebaseDatabase.observeChildEvent(mockDatabase, TestData.class)
                 .subscribeOn(Schedulers.immediate())
                 .subscribe(testSubscriber);
 
         ArgumentCaptor<ChildEventListener> argument = ArgumentCaptor.forClass(ChildEventListener.class);
         verify(mockDatabase).addChildEventListener(argument.capture());
-        argument.getValue().onCancelled(DatabaseError.zznw(DatabaseError.DISCONNECTED));
+        argument.getValue().onCancelled(DatabaseError.zzadi(DatabaseError.DISCONNECTED));
 
         testSubscriber.assertError(RxFirebaseDataException.class);
         testSubscriber.assertNotCompleted();
@@ -288,6 +310,4 @@ public class RxFirebaseDatabaseTests {
         int id;
         String str;
     }
-
-
 }

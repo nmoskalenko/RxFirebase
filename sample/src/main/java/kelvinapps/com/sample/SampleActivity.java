@@ -9,8 +9,10 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.kelvinapps.rxfirebase.DataSnapshotMapper;
 import com.kelvinapps.rxfirebase.RxFirebaseAuth;
 import com.kelvinapps.rxfirebase.RxFirebaseDatabase;
 import com.kelvinapps.rxfirebase.RxFirebaseStorage;
@@ -18,6 +20,9 @@ import com.kelvinapps.rxfirebase.RxFirebaseUser;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+
+import rx.Observable;
 
 public class SampleActivity extends AppCompatActivity {
 
@@ -41,15 +46,17 @@ public class SampleActivity extends AppCompatActivity {
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         // observe posts list under "posts" child.
-        RxFirebaseDatabase.observeValues(reference.child("posts"), BlogPost.class)
+        RxFirebaseDatabase.observeValueEvent(reference.child("posts"), DataSnapshotMapper.of(new GenericTypeIndicator<List<BlogPost>>() {
+        }))
+                .flatMap(Observable::from)
                 .subscribe(blogPost -> {
-                    postsTextView.setText(postsTextView.getText().toString() + blogPost.toString());
+                    postsTextView.setText(postsTextView.getText().toString() + blogPost.toString() + "\n");
                 }, throwable -> {
                     Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
                 });
 
         // observe single user "nick"
-        RxFirebaseDatabase.observeSingleValue(reference.child("users").child("nick"), User.class)
+        RxFirebaseDatabase.observeSingleValueEvent(reference.child("users").child("nick"), User.class)
                 .subscribe(user -> {
                     userTextView.setText(user.toString());
                 }, throwable -> {
