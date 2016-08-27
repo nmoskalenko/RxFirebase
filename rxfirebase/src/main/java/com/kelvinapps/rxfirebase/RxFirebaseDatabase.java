@@ -154,7 +154,7 @@ public class RxFirebaseDatabase {
     @NonNull
     public static <T> Observable<RxFirebaseChildEvent<T>> observeChildEvent(
             @NonNull final Query query, @NonNull final Class<T> clazz) {
-        return observeChildEvent(query, DataSnapshotMapper.ofChild(clazz));
+        return observeChildEvent(query, DataSnapshotMapper.ofChildEvent(clazz));
     }
 
     @NonNull

@@ -1,6 +1,7 @@
 package com.kelvinapps.rxfirebase;
 
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.kelvinapps.rxfirebase.exceptions.RxFirebaseDataCastException;
 
 import rx.exceptions.Exceptions;
@@ -19,7 +20,11 @@ public abstract class DataSnapshotMapper<T, U> implements Func1<T, U> {
         return new TypedDataSnapshotMapper<U>(clazz);
     }
 
-    public static <U> DataSnapshotMapper<RxFirebaseChildEvent<DataSnapshot>, RxFirebaseChildEvent<U>> ofChild(Class<U> clazz) {
+    public static <U> DataSnapshotMapper<DataSnapshot, U> of(GenericTypeIndicator<U> genericTypeIndicator) {
+        return new GenericTypedDataSnapshotMapper<U>(genericTypeIndicator);
+    }
+
+    public static <U> DataSnapshotMapper<RxFirebaseChildEvent<DataSnapshot>, RxFirebaseChildEvent<U>> ofChildEvent(Class<U> clazz) {
         return new ChildEventDataSnapshotMapper<U>(clazz);
     }
 
@@ -33,9 +38,8 @@ public abstract class DataSnapshotMapper<T, U> implements Func1<T, U> {
 
         @Override
         public U call(final DataSnapshot dataSnapshot) {
-            U value = dataSnapshot.getValue(clazz);
-            if (value != null) {
-                return value;
+            if (dataSnapshot.exists()) {
+                return dataSnapshot.getValue(clazz);
             } else {
                 throw Exceptions.propagate(new RxFirebaseDataCastException(
                         "unable to cast firebase data response to " + clazz.getSimpleName()));
@@ -43,19 +47,45 @@ public abstract class DataSnapshotMapper<T, U> implements Func1<T, U> {
         }
     }
 
-    private static class ChildEventDataSnapshotMapper<U> extends DataSnapshotMapper<RxFirebaseChildEvent<DataSnapshot>, RxFirebaseChildEvent<U>> {
+    private static class GenericTypedDataSnapshotMapper<U> extends DataSnapshotMapper<DataSnapshot, U> {
 
-        private final DataSnapshotMapper<DataSnapshot, U> dataSnapshotMapper;
+        private final GenericTypeIndicator<U> genericTypeIndicator;
+
+        public GenericTypedDataSnapshotMapper(GenericTypeIndicator<U> genericTypeIndicator) {
+            this.genericTypeIndicator = genericTypeIndicator;
+        }
+
+        @Override
+        public U call(DataSnapshot dataSnapshot) {
+            if (dataSnapshot.exists()) {
+                return dataSnapshot.getValue(genericTypeIndicator);
+            } else {
+                throw Exceptions.propagate(new RxFirebaseDataCastException(
+                        "unable to cast firebase data response to generic type"));
+            }
+        }
+    }
+
+    private static class ChildEventDataSnapshotMapper<U>
+            extends DataSnapshotMapper<RxFirebaseChildEvent<DataSnapshot>, RxFirebaseChildEvent<U>> {
+
+        private final Class<U> clazz;
 
         public ChildEventDataSnapshotMapper(final Class<U> clazz) {
-            this.dataSnapshotMapper = DataSnapshotMapper.of(clazz);
+            this.clazz = clazz;
         }
 
         @Override
         public RxFirebaseChildEvent<U> call(final RxFirebaseChildEvent<DataSnapshot> rxFirebaseChildEvent) {
-            U value = dataSnapshotMapper.call(rxFirebaseChildEvent.getValue());
-            return new RxFirebaseChildEvent<U>(value, rxFirebaseChildEvent.getPreviousChildName(),
-                    rxFirebaseChildEvent.getEventType());
+            DataSnapshot dataSnapshot = rxFirebaseChildEvent.getValue();
+            if (dataSnapshot.exists()) {
+                return new RxFirebaseChildEvent<U>(dataSnapshot.getValue(clazz),
+                        rxFirebaseChildEvent.getPreviousChildName(),
+                        rxFirebaseChildEvent.getEventType());
+            } else {
+                throw Exceptions.propagate(new RxFirebaseDataCastException(
+                        "unable to cast firebase data response to " + clazz.getSimpleName()));
+            }
         }
     }
 }

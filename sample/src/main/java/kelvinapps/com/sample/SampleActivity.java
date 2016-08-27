@@ -9,6 +9,7 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.kelvinapps.rxfirebase.DataSnapshotMapper;
@@ -19,6 +20,9 @@ import com.kelvinapps.rxfirebase.RxFirebaseUser;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+
+import rx.Observable;
 
 public class SampleActivity extends AppCompatActivity {
 
@@ -42,9 +46,10 @@ public class SampleActivity extends AppCompatActivity {
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         // observe posts list under "posts" child.
-        RxFirebaseDatabase.observeValueEvent(reference.child("posts"), BlogPost.class)
+        RxFirebaseDatabase.observeValueEvent(reference.child("posts"), DataSnapshotMapper.of(new GenericTypeIndicator<List<BlogPost>>() {}))
+                .flatMap(Observable::from)
                 .subscribe(blogPost -> {
-                    postsTextView.setText(postsTextView.getText().toString() + blogPost.toString());
+                    postsTextView.setText(postsTextView.getText().toString() + blogPost.toString() + "\n");
                 }, throwable -> {
                     Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
                 });
