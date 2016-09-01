@@ -16,7 +16,7 @@ Library provides set of static methods of classes:
 - RxFirebaseDatabase
 - RxFirebaseStorage
 
-##### Authentication:
+### Authentication:
 
 Sign in anonymously and get token:
 ```java
@@ -29,8 +29,10 @@ RxFirebaseAuth.signInAnonymously(FirebaseAuth.getInstance())
                 });
 ```
 
-##### Database:
-You can query single value like:
+### Database:
+Many thanks to @renanferrari for making it much more flexible.
+
+You can observe the value providing the Class of expected data like:
 ```java
 RxFirebaseDatabase.observeSingleValue(reference.child("users").child("nick"), User.class)
             .subscribe(user -> {
@@ -40,18 +42,19 @@ RxFirebaseDatabase.observeSingleValue(reference.child("users").child("nick"), Us
             });
 ```
 
-or the list of values:
+or providing the your own mapper between DataSnapshot and your data type:
 
 ```java
-RxFirebaseDatabase.observeValuesList(reference.child("posts"), BlogPost.class)
-            .subscribe(blogPosts -> {
-                postsTextView.setText(blogPosts.toString());
-            }, throwable -> {
-                Log.e("RxFirebaseSample", throwable.toString());
-            });
+RxFirebaseDatabase.observeValueEvent(reference.child("posts"), DataSnapshotMapper.of(new GenericTypeIndicator<List<BlogPost>>() {}))
+                .flatMap(Observable::from)
+                .subscribe(blogPost -> {
+                    postsTextView.setText(postsTextView.getText().toString() + blogPost.toString() + "\n");
+                }, throwable -> {
+                    Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
+                });
 ```
 
-##### Storage
+### Storage
 
 Download file from Firebase storage
 
@@ -82,10 +85,10 @@ RxFirebaseStorage.getBytes(storageRef.child("README.md"), 1024 * 100)
 ##### Gradle:
 ```groovy
 dependencies {
-  compile 'com.google.firebase:firebase-auth:9.0.0'
-  compile 'com.google.firebase:firebase-database:9.0.0'
-  compile 'com.google.firebase:firebase-storage:9.0.0'
-  compile 'com.kelvinapps:rxfirebase:0.0.11'
+  compile 'com.google.firebase:firebase-auth:9.4.0'
+  compile 'com.google.firebase:firebase-database:9.4.0'
+  compile 'com.google.firebase:firebase-storage:9.4.0'
+  compile 'com.kelvinapps:rxfirebase:0.0.12'
 }
 ```
 
@@ -94,7 +97,7 @@ dependencies {
 <dependency>
   <groupId>com.kelvinapps</groupId>
   <artifactId>rxfirebase</artifactId>
-  <version>0.0.11</version>
+  <version>0.0.12</version>
   <type>pom</type>
 </dependency>
 ```

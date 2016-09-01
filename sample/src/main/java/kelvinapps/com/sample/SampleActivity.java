@@ -34,44 +34,20 @@ public class SampleActivity extends AppCompatActivity {
         final TextView postsTextView = (TextView) findViewById(R.id.txtPosts);
         final TextView userTextView = (TextView) findViewById(R.id.txtUsers);
 
-        // authenticating and getting user token.
-        RxFirebaseAuth.signInAnonymously(FirebaseAuth.getInstance())
-                .flatMap(x -> RxFirebaseUser.getToken(FirebaseAuth.getInstance().getCurrentUser(), false))
-                .subscribe(token -> {
-                    Log.i("rxFirebaseSample", "user token: " + token.getToken());
-                }, throwable -> {
-                    Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
-                });
-
+        authenticate();
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        // observe posts list under "posts" child.
-        RxFirebaseDatabase.observeValueEvent(reference.child("posts"), DataSnapshotMapper.of(new GenericTypeIndicator<List<BlogPost>>() {
-        }))
-                .flatMap(Observable::from)
-                .subscribe(blogPost -> {
-                    postsTextView.setText(postsTextView.getText().toString() + blogPost.toString() + "\n");
-                }, throwable -> {
-                    Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
-                });
 
-        // observe single user "nick"
-        RxFirebaseDatabase.observeSingleValueEvent(reference.child("users").child("nick"), User.class)
-                .subscribe(user -> {
-                    userTextView.setText(user.toString());
-                }, throwable -> {
-                    Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
-                });
+        getBlogPostsAsList(postsTextView, reference);
+        getUser(userTextView, reference);
+        getUserCustomMapper(userTextView, reference);
 
         StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://project-1125675579821020265.appspot.com");
-        RxFirebaseStorage.getBytes(storageRef.child("README.md"), 1024 * 100)
-                .subscribe(bytes -> {
-                    Log.i("rxFirebaseSample", "downloaded: " + new String(bytes));
-                }, throwable -> {
-                    Log.e("rxFirebaseSample", throwable.toString());
-                });
+        downloadFile(storageRef);
+        uploadFile(storageRef);
+    }
 
-
+    private void uploadFile(StorageReference storageRef) {
         File targetFile = null;
         try {
             targetFile = File.createTempFile("tmp", "rx");
@@ -84,7 +60,57 @@ public class SampleActivity extends AppCompatActivity {
                 }, throwable -> {
                     Log.e("rxFirebaseSample", throwable.toString());
                 });
+    }
 
+    private void downloadFile(StorageReference storageRef) {
+        RxFirebaseStorage.getBytes(storageRef.child("README.md"), 1024 * 100)
+                .subscribe(bytes -> {
+                    Log.i("rxFirebaseSample", "downloaded: " + new String(bytes));
+                }, throwable -> {
+                    Log.e("rxFirebaseSample", throwable.toString());
+                });
+    }
 
+    private void getUserCustomMapper(TextView userTextView, DatabaseReference reference) {
+        // observe single user "nick"
+        RxFirebaseDatabase.observeSingleValueEvent(reference.child("users").child("nick"), DataSnapshotMapper.of(User.class))
+                .subscribe(user -> {
+                    userTextView.setText(user.toString());
+                }, throwable -> {
+                    Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
+                });
+    }
+
+    private void getUser(TextView userTextView, DatabaseReference reference) {
+        // observe single user "nick"
+        RxFirebaseDatabase.observeSingleValueEvent(reference.child("users").child("nick"), User.class)
+                .subscribe(user -> {
+                    userTextView.setText(user.toString());
+                }, throwable -> {
+                    Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
+                });
+    }
+
+    private void getBlogPostsAsList(TextView postsTextView, DatabaseReference reference) {
+        // observe posts list under "posts" child.
+        RxFirebaseDatabase.observeValueEvent(reference.child("posts"), DataSnapshotMapper.of(new GenericTypeIndicator<List<BlogPost>>() {
+        }))
+                .flatMap(Observable::from)
+                .subscribe(blogPost -> {
+                    postsTextView.setText(postsTextView.getText().toString() + blogPost.toString() + "\n");
+                }, throwable -> {
+                    Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
+                });
+    }
+
+    private void authenticate() {
+        // authenticating and getting user token.
+        RxFirebaseAuth.signInAnonymously(FirebaseAuth.getInstance())
+                .flatMap(x -> RxFirebaseUser.getToken(FirebaseAuth.getInstance().getCurrentUser(), false))
+                .subscribe(token -> {
+                    Log.i("rxFirebaseSample", "user token: " + token.getToken());
+                }, throwable -> {
+                    Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
+                });
     }
 }

@@ -5,8 +5,8 @@ package kelvinapps.com.sample;
  */
 public class BlogPost {
 
-    String title;
-    String author;
+    private String title;
+    private String author;
 
     public BlogPost() {
     }

@@ -5,8 +5,13 @@ package kelvinapps.com.sample;
  */
 public class User {
 
-    String birthYear;
-    String fullName;
+    private String birthYear;
+    private String fullName;
+
+    public User(String birthYear, String fullName) {
+        this.birthYear = birthYear;
+        this.fullName = fullName;
+    }
 
     public String getBirthYear() {
         return birthYear;
