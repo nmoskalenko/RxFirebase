@@ -32,27 +32,45 @@ RxFirebaseAuth.signInAnonymously(FirebaseAuth.getInstance())
 ### Database:
 Many thanks to @renanferrari for making it much more flexible.
 
-You can observe the value providing the Class of expected data like:
+You can simply observe values providing the Class of expected data like:
 ```java
 RxFirebaseDatabase.observeSingleValue(reference.child("users").child("nick"), User.class)
             .subscribe(user -> {
-                userTextView.setText(user.toString());
-            }, throwable -> {
-                Log.e("RxFirebaseSample", throwable.toString());
+                // process user value(nullable)
             });
 ```
 
-or providing the your own mapper between DataSnapshot and your data type:
+or providing your own mapper between DataSnapshot and your data type:
 
 ```java
-RxFirebaseDatabase.observeValueEvent(reference.child("posts"), DataSnapshotMapper.of(new GenericTypeIndicator<List<BlogPost>>() {}))
-                .flatMap(Observable::from)
-                .subscribe(blogPost -> {
-                    postsTextView.setText(postsTextView.getText().toString() + blogPost.toString() + "\n");
-                }, throwable -> {
-                    Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
+RxFirebaseDatabase.observeSingleValueEvent(reference.child("posts"),
+                dataSnapshot -> {
+                    // do your own mapping here
+                    return new User();
+                })
+                .subscribe(user -> {
+                    // process user value
                 });
 ```
+
+There are some pre-defined mappers to make things easier:
+
+###### Observing list values
+ ```java
+ RxFirebaseDatabase.observeSingleValueEvent(reference.child("posts"), DataSnapshotMapper.listOf(BlogPost.class))
+                 .subscribe(blogPost -> {
+                     // process blogPost list item
+                 });
+ ```
+
+###### Observing map values
+ ```java
+         RxFirebaseDatabase.observeSingleValueEvent(reference.child("posts"), DataSnapshotMapper.mapOf(BlogPost.class))
+                 .subscribe(blogPostAsMapItem -> {
+                     // process blogPost as key-value pair
+                 });
+ ```
+
 
 ### Storage
 
@@ -88,7 +106,7 @@ dependencies {
   compile 'com.google.firebase:firebase-auth:9.4.0'
   compile 'com.google.firebase:firebase-database:9.4.0'
   compile 'com.google.firebase:firebase-storage:9.4.0'
-  compile 'com.kelvinapps:rxfirebase:0.0.12'
+  compile 'com.kelvinapps:rxfirebase:0.0.14'
 }
 ```
 
@@ -97,7 +115,7 @@ dependencies {
 <dependency>
   <groupId>com.kelvinapps</groupId>
   <artifactId>rxfirebase</artifactId>
-  <version>0.0.12</version>
+  <version>0.0.14</version>
   <type>pom</type>
 </dependency>
 ```

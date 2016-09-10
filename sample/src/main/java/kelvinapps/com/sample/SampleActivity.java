@@ -9,7 +9,6 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.kelvinapps.rxfirebase.DataSnapshotMapper;
@@ -20,9 +19,6 @@ import com.kelvinapps.rxfirebase.RxFirebaseUser;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-
-import rx.Observable;
 
 public class SampleActivity extends AppCompatActivity {
 
@@ -39,6 +35,8 @@ public class SampleActivity extends AppCompatActivity {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
         getBlogPostsAsList(postsTextView, reference);
+        getBlogPostsAsMap(postsTextView, reference);
+
         getUser(userTextView, reference);
         getNonExistedUser(userTextView, reference);
         getUserCustomMapper(userTextView, reference);
@@ -93,7 +91,7 @@ public class SampleActivity extends AppCompatActivity {
     }
 
     private void getNonExistedUser(TextView userTextView, DatabaseReference reference) {
-        // observe single user "nick"
+        // try to observe non-existed value - would return null
         RxFirebaseDatabase.observeSingleValueEvent(reference.child("users").child("unknown"), User.class)
                 .subscribe(user -> {
                     if (user != null) {
@@ -107,12 +105,20 @@ public class SampleActivity extends AppCompatActivity {
     }
 
     private void getBlogPostsAsList(TextView postsTextView, DatabaseReference reference) {
-        // observe posts list under "posts" child.
-        RxFirebaseDatabase.observeValueEvent(reference.child("posts"), DataSnapshotMapper.of(new GenericTypeIndicator<List<BlogPost>>() {
-        }))
-                .flatMap(Observable::from)
+        // observe posts as list of items
+        RxFirebaseDatabase.observeSingleValueEvent(reference.child("posts"), DataSnapshotMapper.listOf(BlogPost.class))
                 .subscribe(blogPost -> {
                     postsTextView.setText(postsTextView.getText().toString() + blogPost.toString() + "\n");
+                }, throwable -> {
+                    Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
+                });
+    }
+
+    private void getBlogPostsAsMap(TextView postsTextView, DatabaseReference reference) {
+        // observe posts as key-value map of items
+        RxFirebaseDatabase.observeSingleValueEvent(reference.child("posts"), DataSnapshotMapper.mapOf(BlogPost.class))
+                .subscribe(blogPostAsMapItem -> {
+                    postsTextView.setText(postsTextView.getText().toString() + blogPostAsMapItem.toString() + "\n");
                 }, throwable -> {
                     Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
                 });

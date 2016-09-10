@@ -16,8 +16,8 @@ android {
   defaultConfig {
     minSdkVersion 9
     targetSdkVersion 24
-    versionCode 13
-    versionName "0.0.13"
+    versionCode 14
+    versionName "0.0.14"
   }
 
   compileOptions {
@@ -66,7 +66,7 @@ publish {
   userOrg = 'kelvin'
   groupId = 'com.kelvinapps'
   artifactId = 'rxfirebase'
-  publishVersion = '0.0.13'
+  publishVersion = '0.0.14'
   desc = 'RxJava wrapper on Google Firebase for Android library'
   website = 'https://github.com/nmoskalenko/rxFirebase'
 }
