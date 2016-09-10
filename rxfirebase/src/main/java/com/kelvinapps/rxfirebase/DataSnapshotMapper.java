@@ -39,10 +39,14 @@ public abstract class DataSnapshotMapper<T, U> implements Func1<T, U> {
         @Override
         public U call(final DataSnapshot dataSnapshot) {
             if (dataSnapshot.exists()) {
-                return dataSnapshot.getValue(clazz);
+                U value = dataSnapshot.getValue(clazz);
+                if (value == null) {
+                    throw Exceptions.propagate(new RxFirebaseDataCastException(
+                            "unable to cast firebase data response to " + clazz.getSimpleName()));
+                }
+                return value;
             } else {
-                throw Exceptions.propagate(new RxFirebaseDataCastException(
-                        "unable to cast firebase data response to " + clazz.getSimpleName()));
+                return null;
             }
         }
     }
@@ -58,10 +62,14 @@ public abstract class DataSnapshotMapper<T, U> implements Func1<T, U> {
         @Override
         public U call(DataSnapshot dataSnapshot) {
             if (dataSnapshot.exists()) {
-                return dataSnapshot.getValue(genericTypeIndicator);
+                U value = dataSnapshot.getValue(genericTypeIndicator);
+                if (value == null) {
+                    throw Exceptions.propagate(new RxFirebaseDataCastException(
+                            "unable to cast firebase data response to generic type"));
+                }
+                return value;
             } else {
-                throw Exceptions.propagate(new RxFirebaseDataCastException(
-                        "unable to cast firebase data response to generic type"));
+                return null;
             }
         }
     }
@@ -79,12 +87,18 @@ public abstract class DataSnapshotMapper<T, U> implements Func1<T, U> {
         public RxFirebaseChildEvent<U> call(final RxFirebaseChildEvent<DataSnapshot> rxFirebaseChildEvent) {
             DataSnapshot dataSnapshot = rxFirebaseChildEvent.getValue();
             if (dataSnapshot.exists()) {
-                return new RxFirebaseChildEvent<U>(dataSnapshot.getValue(clazz),
+                U value = dataSnapshot.getValue(clazz);
+                if (value == null) {
+                    throw Exceptions.propagate(new RxFirebaseDataCastException(
+                            "unable to cast firebase data response to " + clazz.getSimpleName()));
+                }
+                return new RxFirebaseChildEvent<U>(
+                        dataSnapshot.getKey(),
+                        value,
                         rxFirebaseChildEvent.getPreviousChildName(),
                         rxFirebaseChildEvent.getEventType());
             } else {
-                throw Exceptions.propagate(new RxFirebaseDataCastException(
-                        "unable to cast firebase data response to " + clazz.getSimpleName()));
+                throw Exceptions.propagate(new RuntimeException("child dataSnapshot doesn't exist"));
             }
         }
     }

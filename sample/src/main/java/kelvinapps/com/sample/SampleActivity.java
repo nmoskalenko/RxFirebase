@@ -40,6 +40,7 @@ public class SampleActivity extends AppCompatActivity {
 
         getBlogPostsAsList(postsTextView, reference);
         getUser(userTextView, reference);
+        getNonExistedUser(userTextView, reference);
         getUserCustomMapper(userTextView, reference);
 
         StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://project-1125675579821020265.appspot.com");
@@ -86,6 +87,20 @@ public class SampleActivity extends AppCompatActivity {
         RxFirebaseDatabase.observeSingleValueEvent(reference.child("users").child("nick"), User.class)
                 .subscribe(user -> {
                     userTextView.setText(user.toString());
+                }, throwable -> {
+                    Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
+                });
+    }
+
+    private void getNonExistedUser(TextView userTextView, DatabaseReference reference) {
+        // observe single user "nick"
+        RxFirebaseDatabase.observeSingleValueEvent(reference.child("users").child("unknown"), User.class)
+                .subscribe(user -> {
+                    if (user != null) {
+                        userTextView.setText(user.toString());
+                    } else {
+                        userTextView.setText(userTextView.getText().toString() + "\nno such user");
+                    }
                 }, throwable -> {
                     Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
                 });

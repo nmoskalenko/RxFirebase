@@ -8,20 +8,30 @@ import android.support.annotation.NonNull;
 public class RxFirebaseChildEvent<T> {
 
     private EventType eventType;
+    private String key;
     private T value;
     private String previousChildName;
-    public RxFirebaseChildEvent(@NonNull T data,
+
+    public RxFirebaseChildEvent(@NonNull String key,
+                                @NonNull T value,
                                 @NonNull String previousChildName,
                                 @NonNull EventType eventType) {
-        this.value = data;
+        this.key = key;
+        this.value = value;
         this.previousChildName = previousChildName;
         this.eventType = eventType;
     }
 
 
-    public RxFirebaseChildEvent(@NonNull T data, @NonNull EventType eventType) {
+    public RxFirebaseChildEvent(@NonNull String key, @NonNull T data, @NonNull EventType eventType) {
+        this.key = key;
         this.value = data;
         this.eventType = eventType;
+    }
+
+    @NonNull
+    public String getKey() {
+        return key;
     }
 
     @NonNull
@@ -29,26 +39,14 @@ public class RxFirebaseChildEvent<T> {
         return value;
     }
 
-    public void setValue(@NonNull T value) {
-        this.value = value;
-    }
-
     @NonNull
     public String getPreviousChildName() {
         return previousChildName;
     }
 
-    public void setPreviousChildName(@NonNull String previousChildName) {
-        this.previousChildName = previousChildName;
-    }
-
     @NonNull
     public EventType getEventType() {
         return eventType;
-    }
-
-    public void setEventType(@NonNull EventType eventType) {
-        this.eventType = eventType;
     }
 
     @Override

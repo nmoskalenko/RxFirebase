@@ -8,6 +8,9 @@ public class User {
     private String birthYear;
     private String fullName;
 
+    public User() {
+    }
+
     public User(String birthYear, String fullName) {
         this.birthYear = birthYear;
         this.fullName = fullName;

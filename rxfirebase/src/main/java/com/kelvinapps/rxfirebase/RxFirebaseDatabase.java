@@ -90,7 +90,7 @@ public class RxFirebaseDatabase {
                             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
                                 if (!subscriber.isUnsubscribed()) {
                                     subscriber.onNext(
-                                            new RxFirebaseChildEvent<DataSnapshot>(dataSnapshot, previousChildName,
+                                            new RxFirebaseChildEvent<DataSnapshot>(dataSnapshot.getKey(), dataSnapshot, previousChildName,
                                                     RxFirebaseChildEvent.EventType.ADDED));
                                 }
                             }
@@ -99,7 +99,7 @@ public class RxFirebaseDatabase {
                             public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
                                 if (!subscriber.isUnsubscribed()) {
                                     subscriber.onNext(
-                                            new RxFirebaseChildEvent<DataSnapshot>(dataSnapshot, previousChildName,
+                                            new RxFirebaseChildEvent<DataSnapshot>(dataSnapshot.getKey(), dataSnapshot, previousChildName,
                                                     RxFirebaseChildEvent.EventType.CHANGED));
                                 }
                             }
@@ -107,7 +107,7 @@ public class RxFirebaseDatabase {
                             @Override
                             public void onChildRemoved(DataSnapshot dataSnapshot) {
                                 if (!subscriber.isUnsubscribed()) {
-                                    subscriber.onNext(new RxFirebaseChildEvent<DataSnapshot>(dataSnapshot,
+                                    subscriber.onNext(new RxFirebaseChildEvent<DataSnapshot>(dataSnapshot.getKey(), dataSnapshot,
                                             RxFirebaseChildEvent.EventType.REMOVED));
                                 }
                             }
@@ -116,7 +116,7 @@ public class RxFirebaseDatabase {
                             public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
                                 if (!subscriber.isUnsubscribed()) {
                                     subscriber.onNext(
-                                            new RxFirebaseChildEvent<DataSnapshot>(dataSnapshot, previousChildName,
+                                            new RxFirebaseChildEvent<DataSnapshot>(dataSnapshot.getKey(), dataSnapshot, previousChildName,
                                                     RxFirebaseChildEvent.EventType.MOVED));
                                 }
                             }
@@ -164,8 +164,8 @@ public class RxFirebaseDatabase {
     }
 
     @NonNull
-    public static <T> Observable<T> observeSingleValueEvent(@NonNull final Query query, @NonNull
-    final Func1<? super DataSnapshot, ? extends T> mapper) {
+    public static <T> Observable<T> observeSingleValueEvent(@NonNull final Query query,
+                                                            @NonNull final Func1<? super DataSnapshot, ? extends T> mapper) {
         return observeSingleValueEvent(query).map(mapper);
     }
 
