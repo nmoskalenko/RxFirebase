@@ -244,14 +244,13 @@ public class RxFirebaseStorageTests {
                 .subscribe(testSubscriber);
 
         testOnSuccessListener.getValue().onSuccess(streamSnapshot);
-        testOnCompleteListener.getValue().onComplete(mockStreamDownloadTask);
 
         verify(mockStorageRef).getStream();
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
         testSubscriber.assertReceivedOnNext(Collections.singletonList(streamSnapshot));
-        testSubscriber.assertCompleted();
+        testSubscriber.assertNotCompleted();
         testSubscriber.unsubscribe();
     }
 
@@ -264,14 +263,13 @@ public class RxFirebaseStorageTests {
                 .subscribe(testSubscriber);
 
         testOnSuccessListener.getValue().onSuccess(streamSnapshot);
-        testOnCompleteListener.getValue().onComplete(mockStreamDownloadTask);
 
         verify(mockStorageRef).getStream(processor);
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
         testSubscriber.assertReceivedOnNext(Collections.singletonList(streamSnapshot));
-        testSubscriber.assertCompleted();
+        testSubscriber.assertNotCompleted();
         testSubscriber.unsubscribe();
     }
 
@@ -284,14 +282,13 @@ public class RxFirebaseStorageTests {
                 .subscribe(testSubscriber);
 
         testOnSuccessListener.getValue().onSuccess(uploadSnapshot);
-        testOnCompleteListener.getValue().onComplete(mockUploadTask);
 
         verify(mockStorageRef).putBytes(bytes);
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
         testSubscriber.assertReceivedOnNext(Collections.singletonList(uploadSnapshot));
-        testSubscriber.assertCompleted();
+        testSubscriber.assertNotCompleted();
         testSubscriber.unsubscribe();
     }
 
@@ -304,14 +301,13 @@ public class RxFirebaseStorageTests {
                 .subscribe(testSubscriber);
 
         testOnSuccessListener.getValue().onSuccess(uploadSnapshot);
-        testOnCompleteListener.getValue().onComplete(mockUploadTask);
 
         verify(mockStorageRef).putBytes(bytes, metadata);
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
         testSubscriber.assertReceivedOnNext(Collections.singletonList(uploadSnapshot));
-        testSubscriber.assertCompleted();
+        testSubscriber.assertNotCompleted();
         testSubscriber.unsubscribe();
     }
 
@@ -324,14 +320,13 @@ public class RxFirebaseStorageTests {
                 .subscribe(testSubscriber);
 
         testOnSuccessListener.getValue().onSuccess(uploadSnapshot);
-        testOnCompleteListener.getValue().onComplete(mockUploadTask);
 
         verify(mockStorageRef).putFile(uri);
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
         testSubscriber.assertReceivedOnNext(Collections.singletonList(uploadSnapshot));
-        testSubscriber.assertCompleted();
+        testSubscriber.assertNotCompleted();
         testSubscriber.unsubscribe();
     }
 
@@ -344,14 +339,13 @@ public class RxFirebaseStorageTests {
                 .subscribe(testSubscriber);
 
         testOnSuccessListener.getValue().onSuccess(uploadSnapshot);
-        testOnCompleteListener.getValue().onComplete(mockUploadTask);
 
         verify(mockStorageRef).putFile(uri, metadata);
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
         testSubscriber.assertReceivedOnNext(Collections.singletonList(uploadSnapshot));
-        testSubscriber.assertCompleted();
+        testSubscriber.assertNotCompleted();
         testSubscriber.unsubscribe();
     }
 
@@ -364,14 +358,13 @@ public class RxFirebaseStorageTests {
                 .subscribe(testSubscriber);
 
         testOnSuccessListener.getValue().onSuccess(uploadSnapshot);
-        testOnCompleteListener.getValue().onComplete(mockUploadTask);
 
         verify(mockStorageRef).putFile(uri, metadata, uri);
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
         testSubscriber.assertReceivedOnNext(Collections.singletonList(uploadSnapshot));
-        testSubscriber.assertCompleted();
+        testSubscriber.assertNotCompleted();
         testSubscriber.unsubscribe();
     }
 
@@ -384,14 +377,13 @@ public class RxFirebaseStorageTests {
                 .subscribe(testSubscriber);
 
         testOnSuccessListener.getValue().onSuccess(uploadSnapshot);
-        testOnCompleteListener.getValue().onComplete(mockUploadTask);
 
         verify(mockStorageRef).putStream(stream);
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
         testSubscriber.assertReceivedOnNext(Collections.singletonList(uploadSnapshot));
-        testSubscriber.assertCompleted();
+        testSubscriber.assertNotCompleted();
         testSubscriber.unsubscribe();
     }
 
@@ -404,14 +396,13 @@ public class RxFirebaseStorageTests {
                 .subscribe(testSubscriber);
 
         testOnSuccessListener.getValue().onSuccess(uploadSnapshot);
-        testOnCompleteListener.getValue().onComplete(mockUploadTask);
 
         verify(mockStorageRef).putStream(stream, metadata);
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
         testSubscriber.assertReceivedOnNext(Collections.singletonList(uploadSnapshot));
-        testSubscriber.assertCompleted();
+        testSubscriber.assertNotCompleted();
         testSubscriber.unsubscribe();
     }
 
@@ -424,14 +415,13 @@ public class RxFirebaseStorageTests {
                 .subscribe(testSubscriber);
 
         testOnSuccessListener.getValue().onSuccess(metadata);
-        testOnCompleteListener.getValue().onComplete(mockMetadataTask);
 
         verify(mockStorageRef).updateMetadata(metadata);
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
         testSubscriber.assertReceivedOnNext(Collections.singletonList(metadata));
-        testSubscriber.assertCompleted();
+        testSubscriber.assertNotCompleted();
         testSubscriber.unsubscribe();
     }
 

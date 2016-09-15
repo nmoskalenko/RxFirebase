@@ -47,7 +47,7 @@ public class RxFirebaseStorage {
         return Observable.create(new Observable.OnSubscribe<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void call(final Subscriber<? super FileDownloadTask.TaskSnapshot> subscriber) {
-                RxHandler.assignOnTaskNotCompleted(subscriber, storageRef.getFile(destinationFile));
+                RxHandler.assignOnTask(subscriber, storageRef.getFile(destinationFile));
             }
         });
     }
@@ -58,7 +58,7 @@ public class RxFirebaseStorage {
         return Observable.create(new Observable.OnSubscribe<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void call(final Subscriber<? super FileDownloadTask.TaskSnapshot> subscriber) {
-                RxHandler.assignOnTaskNotCompleted(subscriber, storageRef.getFile(destinationUri));
+                RxHandler.assignOnTask(subscriber, storageRef.getFile(destinationUri));
             }
         });
     }

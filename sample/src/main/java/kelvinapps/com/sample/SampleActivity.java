@@ -1,5 +1,8 @@
 package kelvinapps.com.sample;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -17,6 +20,7 @@ import com.kelvinapps.rxfirebase.RxFirebaseDatabase;
 import com.kelvinapps.rxfirebase.RxFirebaseStorage;
 import com.kelvinapps.rxfirebase.RxFirebaseUser;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
@@ -44,6 +48,9 @@ public class SampleActivity extends AppCompatActivity {
         StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://project-1125675579821020265.appspot.com");
         downloadFile(storageRef);
         uploadFile(storageRef);
+
+        uploadImage(storageRef);
+        downloadImage(storageRef);
     }
 
     private void uploadFile(StorageReference storageRef) {
@@ -67,6 +74,24 @@ public class SampleActivity extends AppCompatActivity {
                     Log.i("rxFirebaseSample", "downloaded: " + new String(bytes));
                 }, throwable -> {
                     Log.e("rxFirebaseSample", throwable.toString());
+                });
+    }
+
+    private void uploadImage(StorageReference storageRef) {
+        Drawable res = getResources().getDrawable(R.drawable.ic_verified_user_black_18dp);
+        Bitmap bitmap = ((BitmapDrawable) res).getBitmap();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        RxFirebaseStorage.putBytes(storageRef.child("image"), stream.toByteArray())
+                .subscribe(url -> {
+                    Log.i("rxFirebaseSample", "url: " + url.toString());
+                });
+    }
+
+    private void downloadImage(StorageReference storageRef) {
+        RxFirebaseStorage.getDownloadUrl(storageRef.child("image"))
+                .subscribe(url -> {
+                    Log.i("rxFirebaseSample", "url: " + url.toString());
                 });
     }
 
