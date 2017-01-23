@@ -103,9 +103,9 @@ RxFirebaseStorage.getBytes(storageRef.child("README.md"), 1024 * 100)
 ##### Gradle:
 ```groovy
 dependencies {
-  compile 'com.google.firebase:firebase-auth:9.4.0'
-  compile 'com.google.firebase:firebase-database:9.4.0'
-  compile 'com.google.firebase:firebase-storage:9.4.0'
+  compile 'com.google.firebase:firebase-auth:10.0.1'
+  compile 'com.google.firebase:firebase-database:10.0.1'
+  compile 'com.google.firebase:firebase-storage:10.0.1'
   compile 'com.kelvinapps:rxfirebase:0.0.15'
 }
 ```

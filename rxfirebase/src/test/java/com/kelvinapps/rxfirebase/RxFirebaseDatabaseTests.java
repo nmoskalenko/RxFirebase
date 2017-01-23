@@ -134,7 +134,7 @@ public class RxFirebaseDatabaseTests {
 
         ArgumentCaptor<ValueEventListener> argument = ArgumentCaptor.forClass(ValueEventListener.class);
         verify(mockDatabase).addListenerForSingleValueEvent(argument.capture());
-        argument.getValue().onCancelled(DatabaseError.zzaer(DatabaseError.DISCONNECTED));
+        argument.getValue().onCancelled(DatabaseError.zzpI(DatabaseError.DISCONNECTED));
 
         testSubscriber.assertError(RxFirebaseDataException.class);
         testSubscriber.assertNotCompleted();
@@ -152,7 +152,7 @@ public class RxFirebaseDatabaseTests {
 
         ArgumentCaptor<ValueEventListener> argument = ArgumentCaptor.forClass(ValueEventListener.class);
         verify(mockDatabase).addListenerForSingleValueEvent(argument.capture());
-        argument.getValue().onCancelled(DatabaseError.zzaer(DatabaseError.OPERATION_FAILED));
+        argument.getValue().onCancelled(DatabaseError.zzpI(DatabaseError.OPERATION_FAILED));
 
         testSubscriber.assertError(RxFirebaseDataException.class);
         testSubscriber.assertNotCompleted();
@@ -338,7 +338,7 @@ public class RxFirebaseDatabaseTests {
 
         ArgumentCaptor<ChildEventListener> argument = ArgumentCaptor.forClass(ChildEventListener.class);
         verify(mockDatabase).addChildEventListener(argument.capture());
-        argument.getValue().onCancelled(DatabaseError.zzaer(DatabaseError.DISCONNECTED));
+        argument.getValue().onCancelled(DatabaseError.zzpI(DatabaseError.DISCONNECTED));
 
         testSubscriber.assertError(RxFirebaseDataException.class);
         testSubscriber.assertNotCompleted();
