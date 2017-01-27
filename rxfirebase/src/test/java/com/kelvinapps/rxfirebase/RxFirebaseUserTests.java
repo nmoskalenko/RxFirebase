@@ -12,9 +12,12 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
 
@@ -27,14 +30,11 @@ import static org.mockito.Mockito.when;
 /**
  * Created by Nick Moskalenko on 24/05/2016.
  */
+@RunWith(MockitoJUnitRunner.class)
 public class RxFirebaseUserTests {
 
     @Mock
     private FirebaseUser mockUser;
-
-    private ArgumentCaptor<OnCompleteListener> testOnCompleteListener;
-    private ArgumentCaptor<OnSuccessListener> testOnSuccessListener;
-    private ArgumentCaptor<OnFailureListener> testOnFailureListener;
 
     @Mock
     private Task<Void> mockTask;
@@ -45,21 +45,28 @@ public class RxFirebaseUserTests {
     @Mock
     private Task<AuthResult> mockAuthResultTask;
 
-
     @Mock
     private UserProfileChangeRequest userProfileChangeRequest;
 
     @Mock
     private GetTokenResult tokenResult;
 
+    @Mock
+    private AuthCredential credential;
+
+    @Mock
+    private AuthResult authResult;
+
+    @Captor
+    private ArgumentCaptor<OnCompleteListener> testOnCompleteListener;
+
+    @Captor
+    private ArgumentCaptor<OnSuccessListener> testOnSuccessListener;
+
+    @Captor
+    private ArgumentCaptor<OnFailureListener> testOnFailureListener;
 
     private Void mockRes = null;
-
-    @Mock
-    AuthCredential credential;
-
-    @Mock
-    AuthResult authResult;
 
 
     @Before
