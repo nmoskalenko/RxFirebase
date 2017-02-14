@@ -7,20 +7,21 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
-import rx.Subscriber;
+import io.reactivex.Emitter;
 
 /**
  * Created by Nick Moskalenko on 24/05/2016.
+ * Adapted to RxJava 2 by Remous-Aris Koutsiamanis on 13/02/2017.
  */
 public class RxHandler<T> implements OnSuccessListener<T>, OnFailureListener, OnCompleteListener<T> {
 
-    private final Subscriber<? super T> subscriber;
+    private final Emitter<? super T> subscriber;
 
-    private RxHandler(Subscriber<? super T> observer) {
+    private RxHandler(Emitter<? super T> observer) {
         this.subscriber = observer;
     }
 
-    public static <T> void assignOnTask(Subscriber<? super T> observer, Task<T> task) {
+    public static <T> void assignOnTask(Emitter<? super T> observer, Task<T> task) {
         RxHandler handler = new RxHandler(observer);
         task.addOnSuccessListener(handler);
         task.addOnFailureListener(handler);
@@ -33,22 +34,16 @@ public class RxHandler<T> implements OnSuccessListener<T>, OnFailureListener, On
 
     @Override
     public void onSuccess(T res) {
-        if (!subscriber.isUnsubscribed()) {
-            subscriber.onNext(res);
-        }
+        subscriber.onNext(res);
     }
 
     @Override
     public void onComplete(@NonNull Task<T> task) {
-        if (!subscriber.isUnsubscribed()) {
-            subscriber.onCompleted();
-        }
+        subscriber.onComplete();
     }
 
     @Override
     public void onFailure(@NonNull Exception e) {
-        if (!subscriber.isUnsubscribed()) {
-            subscriber.onError(e);
-        }
+        subscriber.onError(e);
     }
 }

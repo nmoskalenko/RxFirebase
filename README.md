@@ -4,9 +4,9 @@
 [![Build Status](https://circleci.com/gh/nmoskalenko/RxFirebase/tree/master.svg?style=shield)](https://circleci.com/gh/nmoskalenko/RxFirebase/tree/master)
 [![codecov](https://codecov.io/gh/nmoskalenko/rxFirebase/branch/master/graph/badge.svg)](https://codecov.io/gh/nmoskalenko/rxFirebase)
 
-# RxFirebase
+# RxFirebase 2
 
-RxJava wrapper on Google's [Firebase for Android](https://www.firebase.com/docs/android/) library.
+RxJava 2 wrapper on Google's [Firebase for Android](https://www.firebase.com/docs/android/) library.
 
 
 ## Usage
@@ -123,6 +123,7 @@ dependencies {
 
 ## License
     Copyright 2016 Nickolay Moskalenko
+    Adaptation to RxJava 2 - Copyright 2017 Remous-Aris Koutsiamanis
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

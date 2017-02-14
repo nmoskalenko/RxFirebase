@@ -4,23 +4,25 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.kelvinapps.rxfirebase.exceptions.RxFirebaseDataCastException;
 
+import io.reactivex.Maybe;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import rx.exceptions.Exceptions;
-import rx.functions.Func1;
+import io.reactivex.exceptions.Exceptions;
+import io.reactivex.functions.Function;
 
 /**
  * Created by renanferrari on 09/08/16.
+ * Adapted to RxJava 2 by Remous-Aris Koutsiamanis on 13/02/2017.
  */
 
-public abstract class DataSnapshotMapper<T, U> implements Func1<T, U> {
+public abstract class DataSnapshotMapper<T, U> implements Function<T, U> {
 
     private DataSnapshotMapper() {
     }
 
-    public static <U> DataSnapshotMapper<DataSnapshot, U> of(Class<U> clazz) {
+    public static <U> DataSnapshotMapper<DataSnapshot, Maybe<U>> of(Class<U> clazz) {
         return new TypedDataSnapshotMapper<U>(clazz);
     }
 
@@ -49,7 +51,7 @@ public abstract class DataSnapshotMapper<T, U> implements Func1<T, U> {
         return value;
     }
 
-    private static class TypedDataSnapshotMapper<U> extends DataSnapshotMapper<DataSnapshot, U> {
+    private static class TypedDataSnapshotMapper<U> extends DataSnapshotMapper<DataSnapshot, Maybe<U>> {
 
         private final Class<U> clazz;
 
@@ -58,11 +60,11 @@ public abstract class DataSnapshotMapper<T, U> implements Func1<T, U> {
         }
 
         @Override
-        public U call(final DataSnapshot dataSnapshot) {
+        public Maybe<U> apply(final DataSnapshot dataSnapshot) {
             if (dataSnapshot.exists()) {
-                return getDataSnapshotTypedValue(dataSnapshot, clazz);
+                return Maybe.just(getDataSnapshotTypedValue(dataSnapshot, clazz));
             } else {
-                return null;
+                return Maybe.empty();
             }
         }
     }
@@ -76,7 +78,7 @@ public abstract class DataSnapshotMapper<T, U> implements Func1<T, U> {
         }
 
         @Override
-        public List<U> call(final DataSnapshot dataSnapshot) {
+        public List<U> apply(final DataSnapshot dataSnapshot) {
             List<U> items = new ArrayList<>();
             for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
                 items.add(getDataSnapshotTypedValue(childSnapshot, clazz));
@@ -94,7 +96,7 @@ public abstract class DataSnapshotMapper<T, U> implements Func1<T, U> {
         }
 
         @Override
-        public LinkedHashMap<String, U> call(final DataSnapshot dataSnapshot) {
+        public LinkedHashMap<String, U> apply(final DataSnapshot dataSnapshot) {
             LinkedHashMap<String, U> items = new LinkedHashMap<>();
             for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
                 items.put(childSnapshot.getKey(), getDataSnapshotTypedValue(childSnapshot, clazz));
@@ -112,7 +114,7 @@ public abstract class DataSnapshotMapper<T, U> implements Func1<T, U> {
         }
 
         @Override
-        public U call(DataSnapshot dataSnapshot) {
+        public U apply(DataSnapshot dataSnapshot) {
             if (dataSnapshot.exists()) {
                 U value = dataSnapshot.getValue(genericTypeIndicator);
                 if (value == null) {
@@ -136,7 +138,7 @@ public abstract class DataSnapshotMapper<T, U> implements Func1<T, U> {
         }
 
         @Override
-        public RxFirebaseChildEvent<U> call(final RxFirebaseChildEvent<DataSnapshot> rxFirebaseChildEvent) {
+        public RxFirebaseChildEvent<U> apply(final RxFirebaseChildEvent<DataSnapshot> rxFirebaseChildEvent) {
             DataSnapshot dataSnapshot = rxFirebaseChildEvent.getValue();
             if (dataSnapshot.exists()) {
                 return new RxFirebaseChildEvent<U>(

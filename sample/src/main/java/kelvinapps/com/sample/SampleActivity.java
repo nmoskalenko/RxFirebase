@@ -24,6 +24,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Adapted to RxJava 2 by Remous-Aris Koutsiamanis on 13/02/2017.
+ */
+
 public class SampleActivity extends AppCompatActivity {
 
     @Override
@@ -99,7 +103,7 @@ public class SampleActivity extends AppCompatActivity {
         // observe single user "nick"
         RxFirebaseDatabase.observeSingleValueEvent(reference.child("users").child("nick"), DataSnapshotMapper.of(User.class))
                 .subscribe(user -> {
-                    userTextView.setText(user.toString());
+                    userTextView.setText(user.blockingGet().toString());
                 }, throwable -> {
                     Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
                 });
@@ -109,7 +113,7 @@ public class SampleActivity extends AppCompatActivity {
         // observe single user "nick"
         RxFirebaseDatabase.observeSingleValueEvent(reference.child("users").child("nick"), User.class)
                 .subscribe(user -> {
-                    userTextView.setText(user.toString());
+                    userTextView.setText(user.blockingGet().toString());
                 }, throwable -> {
                     Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
                 });
@@ -119,8 +123,8 @@ public class SampleActivity extends AppCompatActivity {
         // try to observe non-existed value - would return null
         RxFirebaseDatabase.observeSingleValueEvent(reference.child("users").child("unknown"), User.class)
                 .subscribe(user -> {
-                    if (user != null) {
-                        userTextView.setText(user.toString());
+                    if (!user.isEmpty().blockingGet()) {
+                        userTextView.setText(user.blockingGet().toString());
                     } else {
                         userTextView.setText(userTextView.getText().toString() + "\nno such user");
                     }
