@@ -18,14 +18,15 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
 
-import rx.observers.TestSubscriber;
-import rx.schedulers.Schedulers;
+import io.reactivex.observers.TestObserver;
+import io.reactivex.schedulers.Schedulers;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
  * Created by Nick Moskalenko on 24/05/2016.
+ * Adapted to RxJava 2 by Remous-Aris Koutsiamanis on 13/02/2017.
  */
 public class RxFirebaseUserTests {
 
@@ -52,8 +53,8 @@ public class RxFirebaseUserTests {
     @Mock
     private GetTokenResult tokenResult;
 
-
-    private Void mockRes = null;
+    enum Irrelevant { INSTANCE; }
+    private Object mockRes = Irrelevant.INSTANCE;
 
     @Mock
     AuthCredential credential;
@@ -94,9 +95,9 @@ public class RxFirebaseUserTests {
     @Test
     public void getToken() throws InterruptedException {
 
-        TestSubscriber<GetTokenResult> testSubscriber = new TestSubscriber<>();
+        TestObserver<GetTokenResult> testSubscriber = new TestObserver<>();
         RxFirebaseUser.getToken(mockUser, true)
-                .subscribeOn(Schedulers.immediate())
+                .subscribeOn(Schedulers.trampoline())
                 .subscribe(testSubscriber);
 
         testOnSuccessListener.getValue().onSuccess(tokenResult);
@@ -106,17 +107,17 @@ public class RxFirebaseUserTests {
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
-        testSubscriber.assertReceivedOnNext(Collections.singletonList(tokenResult));
-        testSubscriber.assertCompleted();
-        testSubscriber.unsubscribe();
+        testSubscriber.assertValueSequence(Collections.singletonList(tokenResult));
+        testSubscriber.assertComplete();
+        testSubscriber.dispose();
     }
 
     @Test
     public void updateEmail() throws InterruptedException {
 
-        TestSubscriber<Void> testSubscriber = new TestSubscriber<>();
+        TestObserver<Object> testSubscriber = new TestObserver<>();
         RxFirebaseUser.updateEmail(mockUser, "newemail")
-                .subscribeOn(Schedulers.immediate())
+                .subscribeOn(Schedulers.trampoline())
                 .subscribe(testSubscriber);
 
         testOnSuccessListener.getValue().onSuccess(mockRes);
@@ -126,17 +127,17 @@ public class RxFirebaseUserTests {
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
-        testSubscriber.assertReceivedOnNext(Collections.singletonList(mockRes));
-        testSubscriber.assertCompleted();
-        testSubscriber.unsubscribe();
+        testSubscriber.assertValueSequence(Collections.singletonList(mockRes));
+        testSubscriber.assertComplete();
+        testSubscriber.dispose();
     }
 
     @Test
     public void updatePassword() throws InterruptedException {
 
-        TestSubscriber<Void> testSubscriber = new TestSubscriber<>();
+        TestObserver<Object> testSubscriber = new TestObserver<>();
         RxFirebaseUser.updatePassword(mockUser, "password")
-                .subscribeOn(Schedulers.immediate())
+                .subscribeOn(Schedulers.trampoline())
                 .subscribe(testSubscriber);
 
         testOnSuccessListener.getValue().onSuccess(mockRes);
@@ -146,17 +147,17 @@ public class RxFirebaseUserTests {
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
-        testSubscriber.assertReceivedOnNext(Collections.singletonList(mockRes));
-        testSubscriber.assertCompleted();
-        testSubscriber.unsubscribe();
+        testSubscriber.assertValueSequence(Collections.singletonList(mockRes));
+        testSubscriber.assertComplete();
+        testSubscriber.dispose();
     }
 
     @Test
     public void updateProfile() throws InterruptedException {
 
-        TestSubscriber<Void> testSubscriber = new TestSubscriber<>();
+        TestObserver<Object> testSubscriber = new TestObserver<>();
         RxFirebaseUser.updateProfile(mockUser, userProfileChangeRequest)
-                .subscribeOn(Schedulers.immediate())
+                .subscribeOn(Schedulers.trampoline())
                 .subscribe(testSubscriber);
 
         testOnSuccessListener.getValue().onSuccess(mockRes);
@@ -166,17 +167,17 @@ public class RxFirebaseUserTests {
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
-        testSubscriber.assertReceivedOnNext(Collections.singletonList(mockRes));
-        testSubscriber.assertCompleted();
-        testSubscriber.unsubscribe();
+        testSubscriber.assertValueSequence(Collections.singletonList(mockRes));
+        testSubscriber.assertComplete();
+        testSubscriber.dispose();
     }
 
     @Test
     public void delete() throws InterruptedException {
 
-        TestSubscriber<Void> testSubscriber = new TestSubscriber<>();
+        TestObserver<Object> testSubscriber = new TestObserver<>();
         RxFirebaseUser.delete(mockUser)
-                .subscribeOn(Schedulers.immediate())
+                .subscribeOn(Schedulers.trampoline())
                 .subscribe(testSubscriber);
 
         testOnSuccessListener.getValue().onSuccess(mockRes);
@@ -186,17 +187,17 @@ public class RxFirebaseUserTests {
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
-        testSubscriber.assertReceivedOnNext(Collections.singletonList(mockRes));
-        testSubscriber.assertCompleted();
-        testSubscriber.unsubscribe();
+        testSubscriber.assertValueSequence(Collections.singletonList(mockRes));
+        testSubscriber.assertComplete();
+        testSubscriber.dispose();
     }
 
     @Test
     public void reauthenticate() throws InterruptedException {
 
-        TestSubscriber<Void> testSubscriber = new TestSubscriber<>();
+        TestObserver<Object> testSubscriber = new TestObserver<>();
         RxFirebaseUser.reauthenticate(mockUser, credential)
-                .subscribeOn(Schedulers.immediate())
+                .subscribeOn(Schedulers.trampoline())
                 .subscribe(testSubscriber);
 
         testOnSuccessListener.getValue().onSuccess(mockRes);
@@ -206,17 +207,17 @@ public class RxFirebaseUserTests {
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
-        testSubscriber.assertReceivedOnNext(Collections.singletonList(mockRes));
-        testSubscriber.assertCompleted();
-        testSubscriber.unsubscribe();
+        testSubscriber.assertValueSequence(Collections.singletonList(mockRes));
+        testSubscriber.assertComplete();
+        testSubscriber.dispose();
     }
 
     @Test
     public void linkWithCredential() throws InterruptedException {
 
-        TestSubscriber<AuthResult> testSubscriber = new TestSubscriber<>();
+        TestObserver<AuthResult> testSubscriber = new TestObserver<>();
         RxFirebaseUser.linkWithCredential(mockUser, credential)
-                .subscribeOn(Schedulers.immediate())
+                .subscribeOn(Schedulers.trampoline())
                 .subscribe(testSubscriber);
 
         testOnSuccessListener.getValue().onSuccess(authResult);
@@ -226,8 +227,8 @@ public class RxFirebaseUserTests {
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
-        testSubscriber.assertReceivedOnNext(Collections.singletonList(authResult));
-        testSubscriber.assertCompleted();
-        testSubscriber.unsubscribe();
+        testSubscriber.assertValueSequence(Collections.singletonList(authResult));
+        testSubscriber.assertComplete();
+        testSubscriber.dispose();
     }
 }
