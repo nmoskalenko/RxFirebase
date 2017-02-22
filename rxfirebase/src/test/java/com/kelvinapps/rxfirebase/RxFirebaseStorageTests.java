@@ -14,9 +14,11 @@ import com.google.firebase.storage.UploadTask;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.File;
 import java.io.InputStream;
@@ -31,14 +33,11 @@ import static org.mockito.Mockito.when;
 /**
  * Created by Nick Moskalenko on 25/05/2016.
  */
+@RunWith(MockitoJUnitRunner.class)
 public class RxFirebaseStorageTests {
 
     @Mock
     private StorageReference mockStorageRef;
-
-    private ArgumentCaptor<OnCompleteListener> testOnCompleteListener;
-    private ArgumentCaptor<OnSuccessListener> testOnSuccessListener;
-    private ArgumentCaptor<OnFailureListener> testOnFailureListener;
 
     @Mock
     private Task<Void> mockVoidTask;
@@ -61,7 +60,6 @@ public class RxFirebaseStorageTests {
     @Mock
     private UploadTask mockUploadTask;
 
-
     @Mock
     private Uri uri;
 
@@ -80,28 +78,26 @@ public class RxFirebaseStorageTests {
     @Mock
     private UploadTask.TaskSnapshot uploadSnapshot;
 
-
-    private byte[] bytes;
-
     @Mock
     private StreamDownloadTask.StreamProcessor processor;
 
     @Mock
     private InputStream stream;
 
+    @Captor
+    private ArgumentCaptor<OnCompleteListener> testOnCompleteListener;
+
+    @Captor
+    private ArgumentCaptor<OnSuccessListener> testOnSuccessListener;
+
+    @Captor
+    private ArgumentCaptor<OnFailureListener> testOnFailureListener;
+
+    private byte[] bytes;
     private Void voidData = null;
-
-
-
 
     @Before
     public void setup() {
-        MockitoAnnotations.initMocks(this);
-
-        testOnCompleteListener = ArgumentCaptor.forClass(OnCompleteListener.class);
-        testOnSuccessListener = ArgumentCaptor.forClass(OnSuccessListener.class);
-        testOnFailureListener = ArgumentCaptor.forClass(OnFailureListener.class);
-
         setupTask(mockBytesTask);
         setupTask(mockVoidTask);
         setupTask(mockUriTask);

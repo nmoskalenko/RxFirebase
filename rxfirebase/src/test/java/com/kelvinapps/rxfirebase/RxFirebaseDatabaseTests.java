@@ -9,9 +9,10 @@ import com.kelvinapps.rxfirebase.exceptions.RxFirebaseDataException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +34,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by Nick Moskalenko on 28/04/2016.
  */
+@RunWith(MockitoJUnitRunner.class)
 public class RxFirebaseDatabaseTests {
 
     @Mock
@@ -52,8 +54,6 @@ public class RxFirebaseDatabaseTests {
 
     @Before
     public void setup() {
-        MockitoAnnotations.initMocks(this);
-
         testDataList.add(testData);
         testDataMap.put("key", testData);
         testChildEventAdded = new RxFirebaseChildEvent<>("key", testData, "root", RxFirebaseChildEvent.EventType.ADDED);
