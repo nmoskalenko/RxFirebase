@@ -2,6 +2,10 @@ apply plugin: 'com.android.library'
 apply plugin: 'jacoco-android'
 apply plugin: 'com.novoda.bintray-release'
 
+ext {
+    firebaseVersion = '9.4.0'
+}
+
 android {
 
   packagingOptions {
@@ -46,12 +50,12 @@ tasks.withType(Test) {
   }
 }
 
-
 dependencies {
 
-  provided 'com.google.firebase:firebase-auth:9.4.0'
-  provided 'com.google.firebase:firebase-database:9.4.0'
-  provided 'com.google.firebase:firebase-storage:9.4.0'
+  provided "com.google.firebase:firebase-auth:$firebaseVersion"
+  provided "com.google.firebase:firebase-database:$firebaseVersion"
+  provided "com.google.firebase:firebase-storage:$firebaseVersion"
+  provided "com.google.firebase:firebase-config:$firebaseVersion"
   compile 'io.reactivex:rxjava:1.1.9'
   compile 'com.android.support:support-annotations:25.1.0'
 
