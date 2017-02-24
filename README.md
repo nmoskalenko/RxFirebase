@@ -6,8 +6,8 @@
 
 # RxFirebase
 
-RxJava wrapper on Google's [Firebase for Android](https://www.firebase.com/docs/android/) library.
-
+RxJava wrapper on Google's [Firebase for Android](https://www.firebase.com/docs/android/) library. 
+See [RxFirebaseAdmin](https://github.com/Endran/RxFirebaseAdmin) for the RxJava wrapper based on the [Firebase for Java Admin](https://firebase.google.com/docs/admin/setup) library.
 
 ## Usage
 Library provides set of static methods of classes:
