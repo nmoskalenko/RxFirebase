@@ -13,9 +13,11 @@ import com.google.firebase.database.DataSnapshot;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
 
@@ -29,6 +31,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by Nick Moskalenko on 28/04/2016.
  */
+@RunWith(MockitoJUnitRunner.class)
 public class RxFirebaseAuthTests {
 
     @Mock
@@ -58,21 +61,19 @@ public class RxFirebaseAuthTests {
     @Mock
     private FirebaseUser mockUser;
 
-    private Void mockRes = null;
-
+    @Captor
     private ArgumentCaptor<OnCompleteListener> testOnCompleteListener;
+
+    @Captor
     private ArgumentCaptor<OnSuccessListener> testOnSuccessListener;
+
+    @Captor
     private ArgumentCaptor<OnFailureListener> testOnFailureListener;
 
+    private Void mockRes = null;
 
     @Before
     public void setup() {
-        MockitoAnnotations.initMocks(this);
-
-        testOnCompleteListener = ArgumentCaptor.forClass(OnCompleteListener.class);
-        testOnSuccessListener = ArgumentCaptor.forClass(OnSuccessListener.class);
-        testOnFailureListener = ArgumentCaptor.forClass(OnFailureListener.class);
-
         setupTask(mockAuthTask);
         setupTask(mockProviderQueryResultTask);
         setupTask(mockVoidTask);
@@ -86,7 +87,6 @@ public class RxFirebaseAuthTests {
         when(mockAuth.sendPasswordResetEmail("email")).thenReturn(mockVoidTask);
 
         when(mockAuth.getCurrentUser()).thenReturn(mockUser);
-
     }
 
     private <T> void setupTask(Task<T> task) {
