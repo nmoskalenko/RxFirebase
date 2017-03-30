@@ -5,173 +5,299 @@ import android.support.annotation.NonNull;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.kelvinapps.rxfirebase.exceptions.RxFirebaseDataException;
 
-import rx.Observable;
-import rx.Subscriber;
-import rx.functions.Action0;
-import rx.functions.Func1;
-import rx.subscriptions.Subscriptions;
+import java.util.Map;
+
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Completable;
+import io.reactivex.CompletableEmitter;
+import io.reactivex.CompletableOnSubscribe;
+import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
+import io.reactivex.functions.Cancellable;
+import io.reactivex.functions.Function;
 
 /**
  * Created by Nick Moskalenko on 15/05/2016.
+ * Edited by FranGSierra on 13/11/2016.
  */
 public class RxFirebaseDatabase {
 
-    @NonNull
-    public static Observable<DataSnapshot> observeValueEvent(final Query query) {
-        return Observable.create(new Observable.OnSubscribe<DataSnapshot>() {
-            @Override
-            public void call(final Subscriber<? super DataSnapshot> subscriber) {
-                final ValueEventListener valueEventListener = query.addValueEventListener(
-                        new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                if (!subscriber.isUnsubscribed()) {
-                                    subscriber.onNext(dataSnapshot);
-                                }
-                            }
+   @NonNull
+   public static Flowable<DataSnapshot> observeValueEvent(@NonNull final Query query,
+                                                          @NonNull BackpressureStrategy strategy) {
+      return Flowable.create(new FlowableOnSubscribe<DataSnapshot>() {
+         @Override
+         public void subscribe(final FlowableEmitter<DataSnapshot> emitter) throws Exception {
+            final ValueEventListener valueEventListener = new ValueEventListener() {
+               @Override
+               public void onDataChange(DataSnapshot dataSnapshot) {
+                  emitter.onNext(dataSnapshot);
+               }
 
-                            @Override
-                            public void onCancelled(final DatabaseError error) {
-                                if (!subscriber.isUnsubscribed()) {
-                                    subscriber.onError(new RxFirebaseDataException(error));
-                                }
-                            }
-                        });
+               @Override
+               public void onCancelled(final DatabaseError error) {
+                  emitter.onError(new RxFirebaseDataException(error));
+               }
+            };
+            emitter.setCancellable(new Cancellable() {
+               @Override
+               public void cancel() throws Exception {
+                  query.removeEventListener(valueEventListener);
+               }
+            });
+            query.addValueEventListener(valueEventListener);
+         }
+      }, strategy);
+   }
 
-                subscriber.add(Subscriptions.create(new Action0() {
-                    @Override
-                    public void call() {
-                        query.removeEventListener(valueEventListener);
-                    }
-                }));
-            }
-        });
-    }
 
-    @NonNull
-    public static Observable<DataSnapshot> observeSingleValueEvent(@NonNull final Query query) {
-        return Observable.create(new Observable.OnSubscribe<DataSnapshot>() {
-            @Override
-            public void call(final Subscriber<? super DataSnapshot> subscriber) {
-                query.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (!subscriber.isUnsubscribed()) {
-                            subscriber.onNext(dataSnapshot);
-                            subscriber.onCompleted();
-                        }
-                    }
+   @NonNull
+   public static Flowable<DataSnapshot> observeSingleValueEvent(@NonNull final Query query,
+                                                                @NonNull BackpressureStrategy strategy) {
+      return Flowable.create(new FlowableOnSubscribe<DataSnapshot>() {
+         @Override
+         public void subscribe(final FlowableEmitter<DataSnapshot> emitter) throws Exception {
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+               @Override
+               public void onDataChange(DataSnapshot dataSnapshot) {
+                  emitter.onNext(dataSnapshot);
+                  emitter.onComplete();
+               }
 
-                    @Override
-                    public void onCancelled(DatabaseError error) {
-                        if (!subscriber.isUnsubscribed()) {
-                            subscriber.onError(new RxFirebaseDataException(error));
-                        }
-                    }
-                });
-            }
-        });
-    }
+               @Override
+               public void onCancelled(DatabaseError error) {
+                  emitter.onError(new RxFirebaseDataException(error));
+               }
+            });
+         }
+      }, strategy);
+   }
 
-    @NonNull
-    public static Observable<RxFirebaseChildEvent<DataSnapshot>> observeChildEvent(
-            @NonNull final Query query) {
-        return Observable.create(new Observable.OnSubscribe<RxFirebaseChildEvent<DataSnapshot>>() {
-            @Override
-            public void call(final Subscriber<? super RxFirebaseChildEvent<DataSnapshot>> subscriber) {
-                final ChildEventListener childEventListener = query.addChildEventListener(
-                        new ChildEventListener() {
+   @NonNull
+   public static Flowable<DataSnapshot> runTransaction(@NonNull final DatabaseReference ref,
+                                                       @NonNull final boolean fireLocalEvents,
+                                                       @NonNull final long transactionValue,
+                                                       @NonNull BackpressureStrategy strategy) {
+      return Flowable.create(new FlowableOnSubscribe<DataSnapshot>() {
+         @Override
+         public void subscribe(final FlowableEmitter<DataSnapshot> emitter) throws Exception {
+            ref.runTransaction(new Transaction.Handler() {
+               @Override
+               public Transaction.Result doTransaction(MutableData mutableData) {
+                  Integer currentValue = mutableData.getValue(Integer.class);
+                  if (currentValue == null) {
+                     mutableData.setValue(transactionValue);
+                  } else {
+                     mutableData.setValue(currentValue + transactionValue);
+                  }
+                  return Transaction.success(mutableData);
+               }
 
-                            @Override
-                            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
-                                if (!subscriber.isUnsubscribed()) {
-                                    subscriber.onNext(
-                                            new RxFirebaseChildEvent<DataSnapshot>(dataSnapshot.getKey(), dataSnapshot, previousChildName,
-                                                    RxFirebaseChildEvent.EventType.ADDED));
-                                }
-                            }
+               @Override
+               public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                  emitter.onNext(dataSnapshot);
+                  emitter.onComplete();
+               }
+            }, fireLocalEvents);
+         }
+      }, strategy);
+   }
 
-                            @Override
-                            public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
-                                if (!subscriber.isUnsubscribed()) {
-                                    subscriber.onNext(
-                                            new RxFirebaseChildEvent<DataSnapshot>(dataSnapshot.getKey(), dataSnapshot, previousChildName,
-                                                    RxFirebaseChildEvent.EventType.CHANGED));
-                                }
-                            }
+   @NonNull
+   public static Completable updateChildren(@NonNull final DatabaseReference ref,
+                                            @NonNull final Map<String, Object> updateData) {
+      return Completable.create(new CompletableOnSubscribe() {
+         @Override
+         public void subscribe(final CompletableEmitter emitter) throws Exception {
+            ref.updateChildren(updateData, new DatabaseReference.CompletionListener() {
+               @Override
+               public void onComplete(DatabaseError error, DatabaseReference databaseReference) {
+                  if (error != null) {
+                     emitter.onError(new RxFirebaseDataException(error));
+                  } else {
+                     emitter.onComplete();
+                  }
+               }
+            });
+         }
+      });
+   }
 
-                            @Override
-                            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                                if (!subscriber.isUnsubscribed()) {
-                                    subscriber.onNext(new RxFirebaseChildEvent<DataSnapshot>(dataSnapshot.getKey(), dataSnapshot,
-                                            RxFirebaseChildEvent.EventType.REMOVED));
-                                }
-                            }
+   @NonNull
+   public static Flowable<RxFirebaseChildEvent<DataSnapshot>> observeChildEvent(
+         @NonNull final Query query, @NonNull BackpressureStrategy strategy) {
+      return Flowable.create(new FlowableOnSubscribe<RxFirebaseChildEvent<DataSnapshot>>() {
+         @Override
+         public void subscribe(final FlowableEmitter<RxFirebaseChildEvent<DataSnapshot>> emitter) throws Exception {
+            final ChildEventListener childEventListener = new ChildEventListener() {
 
-                            @Override
-                            public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
-                                if (!subscriber.isUnsubscribed()) {
-                                    subscriber.onNext(
-                                            new RxFirebaseChildEvent<DataSnapshot>(dataSnapshot.getKey(), dataSnapshot, previousChildName,
-                                                    RxFirebaseChildEvent.EventType.MOVED));
-                                }
-                            }
+               @Override
+               public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
+                  emitter.onNext(
+                        new RxFirebaseChildEvent<DataSnapshot>(dataSnapshot.getKey(), dataSnapshot, previousChildName,
+                              RxFirebaseChildEvent.EventType.ADDED));
+               }
 
-                            @Override
-                            public void onCancelled(DatabaseError error) {
-                                if (!subscriber.isUnsubscribed()) {
-                                    subscriber.onError(new RxFirebaseDataException(error));
-                                }
-                            }
-                        });
+               @Override
+               public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
+                  emitter.onNext(
+                        new RxFirebaseChildEvent<DataSnapshot>(dataSnapshot.getKey(), dataSnapshot, previousChildName,
+                              RxFirebaseChildEvent.EventType.CHANGED));
+               }
 
-                subscriber.add(Subscriptions.create(new Action0() {
-                    @Override
-                    public void call() {
-                        query.removeEventListener(childEventListener);
-                    }
-                }));
-            }
-        });
-    }
+               @Override
+               public void onChildRemoved(DataSnapshot dataSnapshot) {
+                  emitter.onNext(new RxFirebaseChildEvent<DataSnapshot>(dataSnapshot.getKey(), dataSnapshot,
+                        RxFirebaseChildEvent.EventType.REMOVED));
+               }
 
-    @NonNull
-    public static <T> Observable<T> observeValueEvent(@NonNull final Query query,
-                                                      @NonNull final Class<T> clazz) {
-        return observeValueEvent(query, DataSnapshotMapper.of(clazz));
-    }
+               @Override
+               public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
+                  emitter.onNext(
+                        new RxFirebaseChildEvent<DataSnapshot>(dataSnapshot.getKey(), dataSnapshot, previousChildName,
+                              RxFirebaseChildEvent.EventType.MOVED));
+               }
 
-    @NonNull
-    public static <T> Observable<T> observeSingleValueEvent(@NonNull final Query query,
-                                                            @NonNull final Class<T> clazz) {
-        return observeSingleValueEvent(query, DataSnapshotMapper.of(clazz));
-    }
+               @Override
+               public void onCancelled(DatabaseError error) {
+                  emitter.onError(new RxFirebaseDataException(error));
+               }
+            };
+            emitter.setCancellable(new Cancellable() {
+               @Override
+               public void cancel() throws Exception {
+                  query.removeEventListener(childEventListener);
+               }
+            });
+            query.addChildEventListener(childEventListener);
 
-    @NonNull
-    public static <T> Observable<RxFirebaseChildEvent<T>> observeChildEvent(
-            @NonNull final Query query, @NonNull final Class<T> clazz) {
-        return observeChildEvent(query, DataSnapshotMapper.ofChildEvent(clazz));
-    }
+         }
+      }, strategy);
+   }
 
-    @NonNull
-    public static <T> Observable<T> observeValueEvent(@NonNull final Query query,
-                                                      @NonNull final Func1<? super DataSnapshot, ? extends T> mapper) {
-        return observeValueEvent(query).map(mapper);
-    }
+   @NonNull
+   public static Flowable<DataSnapshot> runTransaction(@NonNull final DatabaseReference ref,
+                                                       @NonNull final long transactionValue,
+                                                       @NonNull BackpressureStrategy strategy) {
+      return runTransaction(ref, true, transactionValue, strategy);
+   }
 
-    @NonNull
-    public static <T> Observable<T> observeSingleValueEvent(@NonNull final Query query,
-                                                            @NonNull final Func1<? super DataSnapshot, ? extends T> mapper) {
-        return observeSingleValueEvent(query).map(mapper);
-    }
+   @NonNull
+   public static <T> Flowable<T> observeValueEvent(@NonNull final Query query,
+                                                   @NonNull final Class<T> clazz,
+                                                   @NonNull BackpressureStrategy strategy) {
+      return observeValueEvent(query, DataSnapshotMapper.of(clazz), strategy);
+   }
 
-    @NonNull
-    public static <T> Observable<RxFirebaseChildEvent<T>> observeChildEvent(
-            @NonNull final Query query, @NonNull final Func1<? super RxFirebaseChildEvent<DataSnapshot>, ? extends RxFirebaseChildEvent<T>> mapper) {
-        return observeChildEvent(query).map(mapper);
-    }
+
+   @NonNull
+   public static <T> Flowable<T> observeSingleValueEvent(@NonNull final Query query,
+                                                         @NonNull final Class<T> clazz,
+                                                         @NonNull BackpressureStrategy strategy) {
+      return observeSingleValueEvent(query, DataSnapshotMapper.of(clazz), strategy);
+   }
+
+   @NonNull
+   public static <T> Flowable<RxFirebaseChildEvent<T>> observeChildEvent(
+         @NonNull final Query query, @NonNull final Class<T> clazz,
+         @NonNull BackpressureStrategy strategy) {
+      return observeChildEvent(query, DataSnapshotMapper.ofChildEvent(clazz), strategy);
+   }
+
+   @NonNull
+   public static <T> Flowable<T> observeValueEvent(@NonNull final Query query,
+                                                   @NonNull final Function<? super DataSnapshot, ? extends T> mapper,
+                                                   @NonNull BackpressureStrategy strategy) {
+      return observeValueEvent(query, strategy).map(mapper);
+   }
+
+   @NonNull
+   public static <T> Flowable<T> observeSingleValueEvent(@NonNull final Query query,
+                                                         @NonNull final Function<? super DataSnapshot, ? extends T> mapper,
+                                                         @NonNull BackpressureStrategy strategy) {
+      return observeSingleValueEvent(query, strategy).map(mapper);
+   }
+
+   @NonNull
+   public static <T> Flowable<RxFirebaseChildEvent<T>> observeChildEvent(
+         @NonNull final Query query, @NonNull final Function<? super RxFirebaseChildEvent<DataSnapshot>,
+         ? extends RxFirebaseChildEvent<T>> mapper, @NonNull BackpressureStrategy strategy) {
+      return observeChildEvent(query, strategy).map(mapper);
+   }
+
+   @NonNull
+   public static Flowable<DataSnapshot> observeValueEvent(@NonNull final Query query) {
+      return observeValueEvent(query, BackpressureStrategy.DROP);
+   }
+
+
+   @NonNull
+   public static Flowable<DataSnapshot> observeSingleValueEvent(@NonNull final Query query) {
+      return observeSingleValueEvent(query, BackpressureStrategy.DROP);
+   }
+
+   @NonNull
+   public static Flowable<DataSnapshot> runTransaction(@NonNull final DatabaseReference ref,
+                                                       @NonNull final boolean fireLocalEvents,
+                                                       @NonNull final long transactionValue) {
+      return runTransaction(ref, fireLocalEvents, transactionValue, BackpressureStrategy.DROP);
+   }
+
+   @NonNull
+   public static Flowable<RxFirebaseChildEvent<DataSnapshot>> observeChildEvent(
+         @NonNull final Query query) {
+      return observeChildEvent(query, BackpressureStrategy.DROP);
+   }
+
+   @NonNull
+   public static Flowable<DataSnapshot> runTransaction(@NonNull final DatabaseReference ref,
+                                                       @NonNull final long transactionValue) {
+      return runTransaction(ref, true, transactionValue, BackpressureStrategy.DROP);
+   }
+
+   @NonNull
+   public static <T> Flowable<T> observeValueEvent(@NonNull final Query query,
+                                                   @NonNull final Class<T> clazz) {
+      return observeValueEvent(query, DataSnapshotMapper.of(clazz), BackpressureStrategy.DROP);
+   }
+
+
+   @NonNull
+   public static <T> Flowable<T> observeSingleValueEvent(@NonNull final Query query,
+                                                         @NonNull final Class<T> clazz) {
+      return observeSingleValueEvent(query, DataSnapshotMapper.of(clazz), BackpressureStrategy.DROP);
+   }
+
+   @NonNull
+   public static <T> Flowable<RxFirebaseChildEvent<T>> observeChildEvent(
+         @NonNull final Query query, @NonNull final Class<T> clazz) {
+      return observeChildEvent(query, DataSnapshotMapper.ofChildEvent(clazz), BackpressureStrategy.DROP);
+   }
+
+   @NonNull
+   public static <T> Flowable<T> observeValueEvent(@NonNull final Query query,
+                                                   @NonNull final Function<? super DataSnapshot, ? extends T> mapper) {
+      return observeValueEvent(query, BackpressureStrategy.DROP).map(mapper);
+   }
+
+   @NonNull
+   public static <T> Flowable<T> observeSingleValueEvent(@NonNull final Query query,
+                                                         @NonNull final Function<? super DataSnapshot, ? extends T> mapper) {
+      return observeSingleValueEvent(query, BackpressureStrategy.DROP).map(mapper);
+   }
+
+   @NonNull
+   public static <T> Flowable<RxFirebaseChildEvent<T>> observeChildEvent(
+         @NonNull final Query query, @NonNull final Function<? super RxFirebaseChildEvent<DataSnapshot>,
+         ? extends RxFirebaseChildEvent<T>> mapper) {
+      return observeChildEvent(query, BackpressureStrategy.DROP).map(mapper);
+   }
 }
