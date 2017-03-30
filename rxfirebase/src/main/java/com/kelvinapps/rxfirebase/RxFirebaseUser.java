@@ -8,89 +8,110 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.UserProfileChangeRequest;
 
-import rx.Observable;
-import rx.Subscriber;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Completable;
+import io.reactivex.CompletableEmitter;
+import io.reactivex.CompletableOnSubscribe;
+import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
 
 /**
  * Created by Nick Moskalenko on 24/05/2016.
+ * Edited by FranGSierra on 13/11/2016.
  */
 public class RxFirebaseUser {
 
-    @NonNull
-    public static Observable<GetTokenResult> getToken(@NonNull final FirebaseUser firebaseUser,
-                                                      final boolean forceRefresh) {
-        return Observable.create(new Observable.OnSubscribe<GetTokenResult>() {
-            @Override
-            public void call(final Subscriber<? super GetTokenResult> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseUser.getToken(forceRefresh));
-            }
-        });
-    }
+   @NonNull
+   public static Flowable<GetTokenResult> getToken(@NonNull final FirebaseUser firebaseUser,
+                                                   final boolean forceRefresh,
+                                                   @NonNull BackpressureStrategy strategy) {
+      return Flowable.create(new FlowableOnSubscribe<GetTokenResult>() {
+         @Override
+         public void subscribe(FlowableEmitter<GetTokenResult> emitter) throws Exception {
+            RxHandler.assignOnTask(emitter, firebaseUser.getToken(forceRefresh));
+         }
+      }, strategy);
+   }
 
-    @NonNull
-    public static Observable<Void> updateEmail(@NonNull final FirebaseUser firebaseUser,
-                                               @NonNull final String email) {
-        return Observable.create(new Observable.OnSubscribe<Void>() {
-            @Override
-            public void call(final Subscriber<? super Void> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseUser.updateEmail(email));
-            }
-        });
-    }
+   @NonNull
+   public static Completable updateEmail(@NonNull final FirebaseUser firebaseUser,
+                                         @NonNull final String email) {
+      return Completable.create(new CompletableOnSubscribe() {
+         @Override
+         public void subscribe(CompletableEmitter emitter) throws Exception {
+            RxCompletableHandler.assignOnTask(emitter, firebaseUser.updateEmail(email));
+         }
+      });
+   }
 
-    @NonNull
-    public static Observable<Void> updatePassword(@NonNull final FirebaseUser firebaseUser,
-                                                  @NonNull final String password) {
-        return Observable.create(new Observable.OnSubscribe<Void>() {
-            @Override
-            public void call(final Subscriber<? super Void> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseUser.updatePassword(password));
-            }
-        });
-    }
+   @NonNull
+   public static Completable updatePassword(@NonNull final FirebaseUser firebaseUser,
+                                            @NonNull final String password) {
+      return Completable.create(new CompletableOnSubscribe() {
+         @Override
+         public void subscribe(CompletableEmitter emitter) throws Exception {
+            RxCompletableHandler.assignOnTask(emitter, firebaseUser.updatePassword(password));
+         }
+      });
+   }
 
-    @NonNull
-    public static Observable<Void> updateProfile(@NonNull final FirebaseUser firebaseUser,
-                                                 @NonNull final UserProfileChangeRequest request) {
-        return Observable.create(new Observable.OnSubscribe<Void>() {
-            @Override
-            public void call(final Subscriber<? super Void> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseUser.updateProfile(request));
-            }
-        });
-    }
+   @NonNull
+   public static Completable updateProfile(@NonNull final FirebaseUser firebaseUser,
+                                           @NonNull final UserProfileChangeRequest request) {
+      return Completable.create(new CompletableOnSubscribe() {
+         @Override
+         public void subscribe(CompletableEmitter emitter) throws Exception {
+            RxCompletableHandler.assignOnTask(emitter, firebaseUser.updateProfile(request));
+         }
+      });
+   }
 
-    @NonNull
-    public static Observable<Void> delete(@NonNull final FirebaseUser firebaseUser) {
-        return Observable.create(new Observable.OnSubscribe<Void>() {
-            @Override
-            public void call(final Subscriber<? super Void> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseUser.delete());
-            }
-        });
-    }
+   @NonNull
+   public static Completable delete(@NonNull final FirebaseUser firebaseUser) {
+      return Completable.create(new CompletableOnSubscribe() {
+         @Override
+         public void subscribe(CompletableEmitter emitter) throws Exception {
+            RxCompletableHandler.assignOnTask(emitter, firebaseUser.delete());
+         }
+      });
+   }
 
-    @NonNull
-    public static Observable<Void> reauthenticate(@NonNull final FirebaseUser firebaseUser,
-                                                  @NonNull final AuthCredential credential) {
-        return Observable.create(new Observable.OnSubscribe<Void>() {
-            @Override
-            public void call(final Subscriber<? super Void> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseUser.reauthenticate(credential));
-            }
-        });
-    }
+   @NonNull
+   public static Completable reAuthenticate(@NonNull final FirebaseUser firebaseUser,
+                                            @NonNull final AuthCredential credential) {
+      return Completable.create(new CompletableOnSubscribe() {
+         @Override
+         public void subscribe(CompletableEmitter emitter) throws Exception {
+            RxCompletableHandler.assignOnTask(emitter, firebaseUser.reauthenticate(credential));
+         }
+      });
+   }
 
-    @NonNull
-    public static Observable<AuthResult> linkWithCredential(@NonNull final FirebaseUser firebaseUser,
-                                                            @NonNull final AuthCredential credential) {
-        return Observable.create(new Observable.OnSubscribe<AuthResult>() {
-            @Override
-            public void call(final Subscriber<? super AuthResult> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseUser.linkWithCredential(credential));
-            }
-        });
-    }
+   @NonNull
+   public static Flowable<AuthResult> linkWithCredential(@NonNull final FirebaseUser firebaseUser,
+                                                         @NonNull final AuthCredential credential,
+                                                         @NonNull BackpressureStrategy strategy) {
+      return Flowable.create(new FlowableOnSubscribe<AuthResult>() {
+         @Override
+         public void subscribe(FlowableEmitter<AuthResult> emitter) throws Exception {
+            RxHandler.assignOnTask(emitter, firebaseUser.linkWithCredential(credential));
+         }
+      }, strategy);
+   }
 
+
+   @NonNull
+   public static Flowable<AuthResult> linkWithCredential(@NonNull final FirebaseUser firebaseUser,
+                                                         @NonNull final AuthCredential credential) {
+      return linkWithCredential(firebaseUser, credential, BackpressureStrategy.DROP);
+   }
+
+
+   @NonNull
+   public static Flowable<GetTokenResult> getToken(@NonNull final FirebaseUser firebaseUser,
+                                                   final boolean forceRefresh) {
+      return getToken(firebaseUser, forceRefresh, BackpressureStrategy.DROP);
+   }
 
 }

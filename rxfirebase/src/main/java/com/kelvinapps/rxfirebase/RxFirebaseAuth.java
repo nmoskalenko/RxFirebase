@@ -5,120 +5,170 @@ import android.support.annotation.NonNull;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.ProviderQueryResult;
 
-import rx.Observable;
-import rx.Subscriber;
-import rx.functions.Action0;
-import rx.subscriptions.Subscriptions;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Completable;
+import io.reactivex.CompletableEmitter;
+import io.reactivex.CompletableOnSubscribe;
+import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
+import io.reactivex.functions.Cancellable;
 
 /**
  * Created by Nick Moskalenko on 15/05/2016.
+ * Edited by FranGSierra on 13/11/2016.
  */
 public class RxFirebaseAuth {
 
-    @NonNull
-    public static Observable<AuthResult> signInAnonymously(@NonNull final FirebaseAuth firebaseAuth) {
-        return Observable.create(new Observable.OnSubscribe<AuthResult>() {
-            @Override
-            public void call(final Subscriber<? super AuthResult> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseAuth.signInAnonymously());
-            }
-        });
-    }
+   @NonNull
+   public static Flowable<AuthResult> signInAnonymously(@NonNull final FirebaseAuth firebaseAuth,
+                                                        @NonNull BackpressureStrategy strategy) {
+      return Flowable.create(new FlowableOnSubscribe<AuthResult>() {
+         @Override
+         public void subscribe(FlowableEmitter<AuthResult> emitter) throws Exception {
+            RxHandler.assignOnTask(emitter, firebaseAuth.signInAnonymously());
+         }
+      }, strategy);
+   }
 
-    @NonNull
-    public static Observable<AuthResult> signInWithEmailAndPassword(@NonNull final FirebaseAuth firebaseAuth,
-                                                                    @NonNull final String email,
-                                                                    @NonNull final String password) {
-        return Observable.create(new Observable.OnSubscribe<AuthResult>() {
-            @Override
-            public void call(final Subscriber<? super AuthResult> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseAuth.signInWithEmailAndPassword(email, password));
-            }
-        });
-    }
+   @NonNull
+   public static Flowable<AuthResult> signInWithEmailAndPassword(@NonNull final FirebaseAuth firebaseAuth,
+                                                                 @NonNull final String email,
+                                                                 @NonNull final String password,
+                                                                 @NonNull BackpressureStrategy strategy) {
+      return Flowable.create(new FlowableOnSubscribe<AuthResult>() {
+         @Override public void subscribe(FlowableEmitter<AuthResult> e) throws Exception {
+            RxHandler.assignOnTask(e, firebaseAuth.signInWithEmailAndPassword(email, password));
+         }
+      }, strategy);
+   }
 
-    @NonNull
-    public static Observable<AuthResult> signInWithCredential(@NonNull final FirebaseAuth firebaseAuth,
-                                                              @NonNull final AuthCredential credential) {
-        return Observable.create(new Observable.OnSubscribe<AuthResult>() {
-            @Override
-            public void call(final Subscriber<? super AuthResult> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseAuth.signInWithCredential(credential));
-            }
-        });
-    }
+   @NonNull
+   public static Flowable<AuthResult> signInWithCredential(@NonNull final FirebaseAuth firebaseAuth,
+                                                           @NonNull final AuthCredential credential,
+                                                           @NonNull BackpressureStrategy strategy) {
+      return Flowable.create(new FlowableOnSubscribe<AuthResult>() {
+         @Override
+         public void subscribe(FlowableEmitter<AuthResult> emitter) throws Exception {
+            RxHandler.assignOnTask(emitter, firebaseAuth.signInWithCredential(credential));
+         }
+      }, strategy);
+   }
 
-    @NonNull
-    public static Observable<AuthResult> signInWithCustomToken(@NonNull final FirebaseAuth firebaseAuth,
-                                                               @NonNull final String token) {
-        return Observable.create(new Observable.OnSubscribe<AuthResult>() {
-            @Override
-            public void call(final Subscriber<? super AuthResult> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseAuth.signInWithCustomToken(token));
-            }
-        });
-    }
+   @NonNull
+   public static Flowable<AuthResult> signInWithCustomToken(@NonNull final FirebaseAuth firebaseAuth,
+                                                            @NonNull final String token,
+                                                            @NonNull BackpressureStrategy strategy) {
+      return Flowable.create(new FlowableOnSubscribe<AuthResult>() {
+         @Override
+         public void subscribe(FlowableEmitter<AuthResult> emitter) throws Exception {
+            RxHandler.assignOnTask(emitter, firebaseAuth.signInWithCustomToken(token));
+         }
+      }, strategy);
+   }
 
-    @NonNull
-    public static Observable<AuthResult> createUserWithEmailAndPassword(@NonNull final FirebaseAuth firebaseAuth,
-                                                                        @NonNull final String email,
-                                                                        @NonNull final String password) {
-        return Observable.create(new Observable.OnSubscribe<AuthResult>() {
-            @Override
-            public void call(final Subscriber<? super AuthResult> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseAuth.createUserWithEmailAndPassword(email, password));
-            }
-        });
-    }
+   @NonNull
+   public static Flowable<AuthResult> createUserWithEmailAndPassword(@NonNull final FirebaseAuth firebaseAuth,
+                                                                     @NonNull final String email,
+                                                                     @NonNull final String password,
+                                                                     @NonNull BackpressureStrategy strategy) {
+      return Flowable.create(new FlowableOnSubscribe<AuthResult>() {
+         @Override
+         public void subscribe(FlowableEmitter<AuthResult> emitter) throws Exception {
+            RxHandler.assignOnTask(emitter, firebaseAuth.createUserWithEmailAndPassword(email, password));
+         }
+      }, strategy);
+   }
 
-    @NonNull
-    public static Observable<ProviderQueryResult> fetchProvidersForEmail(@NonNull final FirebaseAuth firebaseAuth,
-                                                                         @NonNull final String email) {
-        return Observable.create(new Observable.OnSubscribe<ProviderQueryResult>() {
-            @Override
-            public void call(final Subscriber<? super ProviderQueryResult> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseAuth.fetchProvidersForEmail(email));
-            }
-        });
-    }
+   @NonNull
+   public static Flowable<ProviderQueryResult> fetchProvidersForEmail(@NonNull final FirebaseAuth firebaseAuth,
+                                                                      @NonNull final String email,
+                                                                      @NonNull BackpressureStrategy strategy) {
+      return Flowable.create(new FlowableOnSubscribe<ProviderQueryResult>() {
+         @Override
+         public void subscribe(FlowableEmitter<ProviderQueryResult> emitter) throws Exception {
+            RxHandler.assignOnTask(emitter, firebaseAuth.fetchProvidersForEmail(email));
+         }
+      }, strategy);
+   }
 
-    @NonNull
-    public static Observable<Void> sendPasswordResetEmail(@NonNull final FirebaseAuth firebaseAuth,
-                                                                @NonNull final String email) {
-        return Observable.create(new Observable.OnSubscribe<Void>() {
-            @Override
-            public void call(final Subscriber<? super Void> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseAuth.sendPasswordResetEmail(email));
-            }
-        });
-    }
+   @NonNull
+   public static Completable sendPasswordResetEmail(@NonNull final FirebaseAuth firebaseAuth,
+                                                    @NonNull final String email) {
+      return Completable.create(new CompletableOnSubscribe() {
+         @Override
+         public void subscribe(CompletableEmitter emitter) throws Exception {
+            RxCompletableHandler.assignOnTask(emitter, firebaseAuth.sendPasswordResetEmail(email));
+         }
+      });
+   }
 
-    @NonNull
-    public static Observable<FirebaseUser> observeAuthState(@NonNull final FirebaseAuth firebaseAuth) {
+   @NonNull
+   public static Flowable<FirebaseAuth> observeAuthState(@NonNull final FirebaseAuth firebaseAuth,
+                                                         @NonNull BackpressureStrategy strategy) {
 
-        return Observable.create(new Observable.OnSubscribe<FirebaseUser>() {
-            @Override
-            public void call(final Subscriber<? super FirebaseUser> subscriber) {
-                final FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {
-                    @Override
-                    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                        if (!subscriber.isUnsubscribed()) {
-                            subscriber.onNext(firebaseAuth.getCurrentUser());
-                        }
-                    }
-                };
-                firebaseAuth.addAuthStateListener(authStateListener);
+      return Flowable.create(new FlowableOnSubscribe<FirebaseAuth>() {
+         @Override
+         public void subscribe(final FlowableEmitter<FirebaseAuth> emitter) throws Exception {
+            final FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {
+               @Override
+               public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                  emitter.onNext(firebaseAuth);
+               }
+            };
+            firebaseAuth.addAuthStateListener(authStateListener);
+            emitter.setCancellable(new Cancellable() {
+               @Override
+               public void cancel() throws Exception {
+                  firebaseAuth.removeAuthStateListener(authStateListener);
+               }
+            });
+         }
+      }, strategy);
+   }
 
-                subscriber.add(Subscriptions.create(new Action0() {
-                    @Override
-                    public void call() {
-                        firebaseAuth.removeAuthStateListener(authStateListener);
-                    }
-                }));
-            }
-        });
-    }
+   @NonNull
+   public static Flowable<AuthResult> signInWithEmailAndPassword(@NonNull final FirebaseAuth firebaseAuth,
+                                                                 @NonNull final String email,
+                                                                 @NonNull final String password) {
+      return signInWithEmailAndPassword(firebaseAuth, email, password, BackpressureStrategy.DROP);
+   }
+
+   @NonNull
+   public static Flowable<AuthResult> signInAnonymously(@NonNull final FirebaseAuth firebaseAuth) {
+      return signInAnonymously(firebaseAuth, BackpressureStrategy.DROP);
+   }
+
+   @NonNull
+   public static Flowable<AuthResult> signInWithCredential(@NonNull final FirebaseAuth firebaseAuth,
+                                                           @NonNull final AuthCredential credential) {
+      return signInWithCredential(firebaseAuth, credential, BackpressureStrategy.DROP);
+   }
+
+   @NonNull
+   public static Flowable<AuthResult> signInWithCustomToken(@NonNull final FirebaseAuth firebaseAuth,
+                                                            @NonNull final String token) {
+      return signInWithCustomToken(firebaseAuth, token, BackpressureStrategy.DROP);
+   }
+
+   @NonNull
+   public static Flowable<AuthResult> createUserWithEmailAndPassword(@NonNull final FirebaseAuth firebaseAuth,
+                                                                     @NonNull final String email,
+                                                                     @NonNull final String password) {
+      return createUserWithEmailAndPassword(firebaseAuth, email, password, BackpressureStrategy.DROP);
+   }
+
+   @NonNull
+   public static Flowable<ProviderQueryResult> fetchProvidersForEmail(@NonNull final FirebaseAuth firebaseAuth,
+                                                                      @NonNull final String email) {
+      return fetchProvidersForEmail(firebaseAuth, email, BackpressureStrategy.DROP);
+   }
+
+   @NonNull
+   public static Flowable<FirebaseAuth> observeAuthState(@NonNull final FirebaseAuth firebaseAuth) {
+
+      return observeAuthState(firebaseAuth, BackpressureStrategy.DROP);
+   }
 }
