@@ -3,11 +3,11 @@ apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion "25.0.3"
 
     defaultConfig {
         applicationId "kelvinapps.com.sample"
-        minSdkVersion 9
+        minSdkVersion 14
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -33,10 +33,10 @@ android {
 
 dependencies {
     compile project(':rxfirebase')
-    compile 'com.google.firebase:firebase-auth:9.4.0'
-    compile 'com.google.firebase:firebase-database:9.4.0'
-    compile 'com.google.firebase:firebase-storage:9.4.0'
-    compile 'com.android.support:appcompat-v7:25.1.1'
+    compile 'com.google.firebase:firebase-auth:10.2.6'
+    compile 'com.google.firebase:firebase-database:10.2.6'
+    compile 'com.google.firebase:firebase-storage:10.2.6'
+    compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'io.reactivex:rxandroid:1.2.1'
 }
 

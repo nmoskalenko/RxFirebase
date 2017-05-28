@@ -11,13 +11,13 @@ android {
   }
 
   compileSdkVersion 25
-  buildToolsVersion "25.0.2"
+  buildToolsVersion "25.0.3"
 
   defaultConfig {
-    minSdkVersion 9
+    minSdkVersion 14
     targetSdkVersion 25
-    versionCode 15
-    versionName "0.0.15"
+    versionCode 16
+    versionName "0.0.16"
   }
 
   compileOptions {
@@ -49,11 +49,12 @@ tasks.withType(Test) {
 
 dependencies {
 
-  provided 'com.google.firebase:firebase-auth:9.4.0'
-  provided 'com.google.firebase:firebase-database:9.4.0'
-  provided 'com.google.firebase:firebase-storage:9.4.0'
+  provided 'com.google.firebase:firebase-auth:10.2.6'
+  provided 'com.google.firebase:firebase-database:10.2.6'
+  provided 'com.google.firebase:firebase-storage:10.2.6'
+  provided 'com.google.firebase:firebase-config:10.2.6'
   compile 'io.reactivex:rxjava:1.1.9'
-  compile 'com.android.support:support-annotations:25.1.1'
+  compile 'com.android.support:support-annotations:25.3.1'
 
 
   testCompile 'junit:junit:4.12'
@@ -66,7 +67,7 @@ publish {
   userOrg = 'kelvin'
   groupId = 'com.kelvinapps'
   artifactId = 'rxfirebase'
-  publishVersion = '0.0.15'
+  publishVersion = '0.0.16'
   desc = 'RxJava wrapper on Google Firebase for Android library'
   website = 'https://github.com/nmoskalenko/rxFirebase'
 }
