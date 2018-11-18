@@ -96,7 +96,7 @@ public class RxFirebaseAuthTests {
     }
 
     @Test
-    public void signInAnonymously() throws InterruptedException {
+    public void signInAnonymously()  {
 
         TestSubscriber<AuthResult> testSubscriber = new TestSubscriber<>();
         RxFirebaseAuth.signInAnonymously(mockAuth)
@@ -116,7 +116,7 @@ public class RxFirebaseAuthTests {
     }
 
     @Test
-    public void signInAnonymously_Failed() throws InterruptedException {
+    public void signInAnonymously_Failed()  {
 
         TestSubscriber<AuthResult> testSubscriber = new TestSubscriber<>();
         RxFirebaseAuth.signInAnonymously(mockAuth)
@@ -134,7 +134,7 @@ public class RxFirebaseAuthTests {
     }
 
     @Test
-    public void signInWithEmailAndPassword() throws InterruptedException {
+    public void signInWithEmailAndPassword()  {
 
         TestSubscriber<AuthResult> testSubscriber = new TestSubscriber<>();
         RxFirebaseAuth.signInWithEmailAndPassword(mockAuth, "email", "password")
@@ -154,7 +154,7 @@ public class RxFirebaseAuthTests {
     }
 
     @Test
-    public void signInWithEmailAndPassword_AuthError() throws InterruptedException {
+    public void signInWithEmailAndPassword_AuthError()  {
 
         TestSubscriber<AuthResult> testSubscriber = new TestSubscriber<>();
         RxFirebaseAuth.signInWithEmailAndPassword(mockAuth, "email", "password")
@@ -172,7 +172,7 @@ public class RxFirebaseAuthTests {
     }
 
     @Test
-    public void signInWithCredential() throws InterruptedException {
+    public void signInWithCredential()  {
 
         TestSubscriber<AuthResult> testSubscriber = new TestSubscriber<>();
         RxFirebaseAuth.signInWithCredential(mockAuth, mockCredentials)
@@ -192,7 +192,7 @@ public class RxFirebaseAuthTests {
     }
 
     @Test
-    public void signInWithCustomToken() throws InterruptedException {
+    public void signInWithCustomToken()  {
 
         TestSubscriber<AuthResult> testSubscriber = new TestSubscriber<>();
         RxFirebaseAuth.signInWithCustomToken(mockAuth, "token")
@@ -212,7 +212,7 @@ public class RxFirebaseAuthTests {
     }
 
     @Test
-    public void createUserWithEmailAndPassword() throws InterruptedException {
+    public void createUserWithEmailAndPassword()  {
 
         TestSubscriber<AuthResult> testSubscriber = new TestSubscriber<>();
         RxFirebaseAuth.createUserWithEmailAndPassword(mockAuth, "email", "password")
@@ -232,7 +232,7 @@ public class RxFirebaseAuthTests {
     }
 
     @Test
-    public void fetchProvidersForEmail() throws InterruptedException {
+    public void fetchProvidersForEmail()  {
 
         TestSubscriber<ProviderQueryResult> testSubscriber = new TestSubscriber<>();
         RxFirebaseAuth.fetchProvidersForEmail(mockAuth, "email")
@@ -252,7 +252,7 @@ public class RxFirebaseAuthTests {
     }
 
     @Test
-    public void sendPasswordResetEmail() throws InterruptedException {
+    public void sendPasswordResetEmail()  {
 
         TestSubscriber<Void> testSubscriber = new TestSubscriber<>();
         RxFirebaseAuth.sendPasswordResetEmail(mockAuth, "email")
@@ -272,7 +272,7 @@ public class RxFirebaseAuthTests {
     }
 
     @Test
-    public void testObserveAuthState() throws InterruptedException {
+    public void testObserveAuthState()  {
 
         TestSubscriber<FirebaseUser> testSubscriber = new TestSubscriber<>();
         RxFirebaseAuth.observeAuthState(mockAuth)

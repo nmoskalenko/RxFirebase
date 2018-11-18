@@ -132,7 +132,7 @@ public class RxFirebaseStorageTests {
     }
 
     @Test
-    public void getBytes() throws InterruptedException {
+    public void getBytes() {
 
         TestSubscriber<byte[]> testSubscriber = new TestSubscriber<>();
         RxFirebaseStorage.getBytes(mockStorageRef, 20)
@@ -152,7 +152,7 @@ public class RxFirebaseStorageTests {
     }
 
     @Test
-    public void getDownloadUrl() throws InterruptedException {
+    public void getDownloadUrl() {
 
         TestSubscriber<Uri> testSubscriber = new TestSubscriber<>();
         RxFirebaseStorage.getDownloadUrl(mockStorageRef)
@@ -172,7 +172,7 @@ public class RxFirebaseStorageTests {
     }
 
     @Test
-    public void getFile() throws InterruptedException {
+    public void getFile() {
 
         TestSubscriber<FileDownloadTask.TaskSnapshot> testSubscriber = new TestSubscriber<>();
         RxFirebaseStorage.getFile(mockStorageRef, file)
@@ -191,7 +191,7 @@ public class RxFirebaseStorageTests {
     }
 
     @Test
-    public void getFileUri() throws InterruptedException {
+    public void getFileUri() {
 
         TestSubscriber<FileDownloadTask.TaskSnapshot> testSubscriber = new TestSubscriber<>();
         RxFirebaseStorage.getFile(mockStorageRef, uri)
@@ -211,7 +211,7 @@ public class RxFirebaseStorageTests {
 
 
     @Test
-    public void getMetadata() throws InterruptedException {
+    public void getMetadata() {
 
         TestSubscriber<StorageMetadata> testSubscriber = new TestSubscriber<>();
         RxFirebaseStorage.getMetadata(mockStorageRef)
@@ -232,7 +232,7 @@ public class RxFirebaseStorageTests {
 
 
     @Test
-    public void getStream() throws InterruptedException {
+    public void getStream() {
 
         TestSubscriber<StreamDownloadTask.TaskSnapshot> testSubscriber = new TestSubscriber<>();
         RxFirebaseStorage.getStream(mockStorageRef)
@@ -251,7 +251,7 @@ public class RxFirebaseStorageTests {
     }
 
     @Test
-    public void getStreamProcessor() throws InterruptedException {
+    public void getStreamProcessor() {
 
         TestSubscriber<StreamDownloadTask.TaskSnapshot> testSubscriber = new TestSubscriber<>();
         RxFirebaseStorage.getStream(mockStorageRef, processor)
@@ -270,7 +270,7 @@ public class RxFirebaseStorageTests {
     }
 
     @Test
-    public void putBytes() throws InterruptedException {
+    public void putBytes() {
 
         TestSubscriber<UploadTask.TaskSnapshot> testSubscriber = new TestSubscriber<>();
         RxFirebaseStorage.putBytes(mockStorageRef, bytes)
@@ -289,7 +289,7 @@ public class RxFirebaseStorageTests {
     }
 
     @Test
-    public void putBytesMetadata() throws InterruptedException {
+    public void putBytesMetadata() {
 
         TestSubscriber<UploadTask.TaskSnapshot> testSubscriber = new TestSubscriber<>();
         RxFirebaseStorage.putBytes(mockStorageRef, bytes, metadata)
@@ -308,7 +308,7 @@ public class RxFirebaseStorageTests {
     }
 
     @Test
-    public void putFile() throws InterruptedException {
+    public void putFile() {
 
         TestSubscriber<UploadTask.TaskSnapshot> testSubscriber = new TestSubscriber<>();
         RxFirebaseStorage.putFile(mockStorageRef, uri)
@@ -327,7 +327,7 @@ public class RxFirebaseStorageTests {
     }
 
     @Test
-    public void putFileMetadata() throws InterruptedException {
+    public void putFileMetadata() {
 
         TestSubscriber<UploadTask.TaskSnapshot> testSubscriber = new TestSubscriber<>();
         RxFirebaseStorage.putFile(mockStorageRef, uri, metadata)
@@ -346,7 +346,7 @@ public class RxFirebaseStorageTests {
     }
 
     @Test
-    public void putFileMetadataAndUri() throws InterruptedException {
+    public void putFileMetadataAndUri() {
 
         TestSubscriber<UploadTask.TaskSnapshot> testSubscriber = new TestSubscriber<>();
         RxFirebaseStorage.putFile(mockStorageRef, uri, metadata, uri)
@@ -365,7 +365,7 @@ public class RxFirebaseStorageTests {
     }
 
     @Test
-    public void putStream() throws InterruptedException {
+    public void putStream() {
 
         TestSubscriber<UploadTask.TaskSnapshot> testSubscriber = new TestSubscriber<>();
         RxFirebaseStorage.putStream(mockStorageRef, stream)
@@ -384,7 +384,7 @@ public class RxFirebaseStorageTests {
     }
 
     @Test
-    public void putStreamMetadata() throws InterruptedException {
+    public void putStreamMetadata() {
 
         TestSubscriber<UploadTask.TaskSnapshot> testSubscriber = new TestSubscriber<>();
         RxFirebaseStorage.putStream(mockStorageRef, stream, metadata)
@@ -403,7 +403,7 @@ public class RxFirebaseStorageTests {
     }
 
     @Test
-    public void updateMetadata() throws InterruptedException {
+    public void updateMetadata() {
 
         TestSubscriber<StorageMetadata> testSubscriber = new TestSubscriber<>();
         RxFirebaseStorage.updateMetadata(mockStorageRef, metadata)
@@ -422,7 +422,7 @@ public class RxFirebaseStorageTests {
     }
 
     @Test
-    public void delete() throws InterruptedException {
+    public void delete() {
 
         TestSubscriber<Void> testSubscriber = new TestSubscriber<>();
         RxFirebaseStorage.delete(mockStorageRef)

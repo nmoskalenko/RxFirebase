@@ -14,20 +14,20 @@ public class RxFirebaseConfig {
 
     @NonNull
     public static Observable<Void> fetch(@NonNull final FirebaseRemoteConfig config) {
-        return Observable.create(new Observable.OnSubscribe<Void>() {
+        return Observable.unsafeCreate(new Observable.OnSubscribe<Void>() {
             @Override
             public void call(final Subscriber<? super Void> subscriber) {
-                RxHandler.assignOnTask(subscriber, config.fetch());
+                RxTask.assignOnTask(subscriber, config.fetch());
             }
         });
     }
 
     @NonNull
     public static Observable<Void> fetch(@NonNull final FirebaseRemoteConfig config, final long cacheExpirationSeconds) {
-        return Observable.create(new Observable.OnSubscribe<Void>() {
+        return Observable.unsafeCreate(new Observable.OnSubscribe<Void>() {
             @Override
             public void call(final Subscriber<? super Void> subscriber) {
-                RxHandler.assignOnTask(subscriber, config.fetch(cacheExpirationSeconds));
+                RxTask.assignOnTask(subscriber, config.fetch(cacheExpirationSeconds));
             }
         });
     }

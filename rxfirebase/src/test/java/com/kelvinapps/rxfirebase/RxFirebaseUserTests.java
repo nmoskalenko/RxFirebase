@@ -81,10 +81,6 @@ public class RxFirebaseUserTests {
         when(mockTask.addOnSuccessListener(testOnSuccessListener.capture())).thenReturn(mockTask);
         when(mockTask.addOnFailureListener(testOnFailureListener.capture())).thenReturn(mockTask);
 
-        when(mockTokenTask.addOnCompleteListener(testOnCompleteListener.capture())).thenReturn(mockTokenTask);
-        when(mockTokenTask.addOnSuccessListener(testOnSuccessListener.capture())).thenReturn(mockTokenTask);
-        when(mockTokenTask.addOnFailureListener(testOnFailureListener.capture())).thenReturn(mockTokenTask);
-
         when(mockAuthResultTask.addOnCompleteListener(testOnCompleteListener.capture())).thenReturn(mockAuthResultTask);
         when(mockAuthResultTask.addOnSuccessListener(testOnSuccessListener.capture())).thenReturn(mockAuthResultTask);
         when(mockAuthResultTask.addOnFailureListener(testOnFailureListener.capture())).thenReturn(mockAuthResultTask);
@@ -92,34 +88,13 @@ public class RxFirebaseUserTests {
         when(mockUser.updateEmail("newemail")).thenReturn(mockTask);
         when(mockUser.updatePassword("password")).thenReturn(mockTask);
         when(mockUser.updateProfile(userProfileChangeRequest)).thenReturn(mockTask);
-        when(mockUser.getToken(true)).thenReturn(mockTokenTask);
         when(mockUser.delete()).thenReturn(mockTask);
         when(mockUser.reauthenticate(credential)).thenReturn(mockTask);
         when(mockUser.linkWithCredential(credential)).thenReturn(mockAuthResultTask);
     }
 
     @Test
-    public void getToken() throws InterruptedException {
-
-        TestSubscriber<GetTokenResult> testSubscriber = new TestSubscriber<>();
-        RxFirebaseUser.getToken(mockUser, true)
-                .subscribeOn(Schedulers.immediate())
-                .subscribe(testSubscriber);
-
-        testOnSuccessListener.getValue().onSuccess(tokenResult);
-        testOnCompleteListener.getValue().onComplete(mockTokenTask);
-
-        verify(mockUser).getToken(true);
-
-        testSubscriber.assertNoErrors();
-        testSubscriber.assertValueCount(1);
-        testSubscriber.assertReceivedOnNext(Collections.singletonList(tokenResult));
-        testSubscriber.assertCompleted();
-        testSubscriber.unsubscribe();
-    }
-
-    @Test
-    public void updateEmail() throws InterruptedException {
+    public void updateEmail()  {
 
         TestSubscriber<Void> testSubscriber = new TestSubscriber<>();
         RxFirebaseUser.updateEmail(mockUser, "newemail")
@@ -139,7 +114,7 @@ public class RxFirebaseUserTests {
     }
 
     @Test
-    public void updatePassword() throws InterruptedException {
+    public void updatePassword()  {
 
         TestSubscriber<Void> testSubscriber = new TestSubscriber<>();
         RxFirebaseUser.updatePassword(mockUser, "password")
@@ -159,7 +134,7 @@ public class RxFirebaseUserTests {
     }
 
     @Test
-    public void updateProfile() throws InterruptedException {
+    public void updateProfile()  {
 
         TestSubscriber<Void> testSubscriber = new TestSubscriber<>();
         RxFirebaseUser.updateProfile(mockUser, userProfileChangeRequest)
@@ -179,7 +154,7 @@ public class RxFirebaseUserTests {
     }
 
     @Test
-    public void delete() throws InterruptedException {
+    public void delete()  {
 
         TestSubscriber<Void> testSubscriber = new TestSubscriber<>();
         RxFirebaseUser.delete(mockUser)
@@ -199,7 +174,7 @@ public class RxFirebaseUserTests {
     }
 
     @Test
-    public void reauthenticate() throws InterruptedException {
+    public void reauthenticate()  {
 
         TestSubscriber<Void> testSubscriber = new TestSubscriber<>();
         RxFirebaseUser.reauthenticate(mockUser, credential)
@@ -219,7 +194,7 @@ public class RxFirebaseUserTests {
     }
 
     @Test
-    public void linkWithCredential() throws InterruptedException {
+    public void linkWithCredential()  {
 
         TestSubscriber<AuthResult> testSubscriber = new TestSubscriber<>();
         RxFirebaseUser.linkWithCredential(mockUser, credential)

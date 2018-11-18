@@ -2,19 +2,19 @@
 
 buildscript {
   repositories {
+    google()
     jcenter()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:2.3.1'
-    classpath 'com.google.gms:google-services:3.0.0'
-    classpath 'me.tatarka:gradle-retrolambda:3.2.5'
-    classpath 'com.novoda:bintray-release:0.3.4'
-    classpath 'com.dicedmelon.gradle:jacoco-android:0.1.1'
+    classpath 'com.android.tools.build:gradle:3.2.1'
+    classpath 'com.google.gms:google-services:4.2.0'
+    classpath 'com.novoda:bintray-release:0.9'
   }
 }
 
 allprojects {
   repositories {
+    google()
     jcenter()
   }
 }

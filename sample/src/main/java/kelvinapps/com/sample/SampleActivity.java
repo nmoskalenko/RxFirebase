@@ -18,7 +18,6 @@ import com.kelvinapps.rxfirebase.DataSnapshotMapper;
 import com.kelvinapps.rxfirebase.RxFirebaseAuth;
 import com.kelvinapps.rxfirebase.RxFirebaseDatabase;
 import com.kelvinapps.rxfirebase.RxFirebaseStorage;
-import com.kelvinapps.rxfirebase.RxFirebaseUser;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -45,7 +44,7 @@ public class SampleActivity extends AppCompatActivity {
         getNonExistedUser(userTextView, reference);
         getUserCustomMapper(userTextView, reference);
 
-        StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://project-1125675579821020265.appspot.com");
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         downloadFile(storageRef);
         uploadFile(storageRef);
 
@@ -152,9 +151,8 @@ public class SampleActivity extends AppCompatActivity {
     private void authenticate() {
         // authenticating and getting user token.
         RxFirebaseAuth.signInAnonymously(FirebaseAuth.getInstance())
-                .flatMap(x -> RxFirebaseUser.getToken(FirebaseAuth.getInstance().getCurrentUser(), false))
-                .subscribe(token -> {
-                    Log.i("rxFirebaseSample", "user token: " + token.getToken());
+                .subscribe(authResult -> {
+                    Log.i("rxFirebaseSample", "user token: " + authResult.getUser().toString());
                 }, throwable -> {
                     Toast.makeText(SampleActivity.this, throwable.toString(), Toast.LENGTH_LONG).show();
                 });

@@ -20,10 +20,10 @@ public class RxFirebaseAuth {
 
     @NonNull
     public static Observable<AuthResult> signInAnonymously(@NonNull final FirebaseAuth firebaseAuth) {
-        return Observable.create(new Observable.OnSubscribe<AuthResult>() {
+        return Observable.unsafeCreate(new Observable.OnSubscribe<AuthResult>() {
             @Override
             public void call(final Subscriber<? super AuthResult> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseAuth.signInAnonymously());
+                RxTask.assignOnTask(subscriber, firebaseAuth.signInAnonymously());
             }
         });
     }
@@ -32,10 +32,10 @@ public class RxFirebaseAuth {
     public static Observable<AuthResult> signInWithEmailAndPassword(@NonNull final FirebaseAuth firebaseAuth,
                                                                     @NonNull final String email,
                                                                     @NonNull final String password) {
-        return Observable.create(new Observable.OnSubscribe<AuthResult>() {
+        return Observable.unsafeCreate(new Observable.OnSubscribe<AuthResult>() {
             @Override
             public void call(final Subscriber<? super AuthResult> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseAuth.signInWithEmailAndPassword(email, password));
+                RxTask.assignOnTask(subscriber, firebaseAuth.signInWithEmailAndPassword(email, password));
             }
         });
     }
@@ -43,10 +43,10 @@ public class RxFirebaseAuth {
     @NonNull
     public static Observable<AuthResult> signInWithCredential(@NonNull final FirebaseAuth firebaseAuth,
                                                               @NonNull final AuthCredential credential) {
-        return Observable.create(new Observable.OnSubscribe<AuthResult>() {
+        return Observable.unsafeCreate(new Observable.OnSubscribe<AuthResult>() {
             @Override
             public void call(final Subscriber<? super AuthResult> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseAuth.signInWithCredential(credential));
+                RxTask.assignOnTask(subscriber, firebaseAuth.signInWithCredential(credential));
             }
         });
     }
@@ -54,10 +54,10 @@ public class RxFirebaseAuth {
     @NonNull
     public static Observable<AuthResult> signInWithCustomToken(@NonNull final FirebaseAuth firebaseAuth,
                                                                @NonNull final String token) {
-        return Observable.create(new Observable.OnSubscribe<AuthResult>() {
+        return Observable.unsafeCreate(new Observable.OnSubscribe<AuthResult>() {
             @Override
             public void call(final Subscriber<? super AuthResult> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseAuth.signInWithCustomToken(token));
+                RxTask.assignOnTask(subscriber, firebaseAuth.signInWithCustomToken(token));
             }
         });
     }
@@ -66,10 +66,10 @@ public class RxFirebaseAuth {
     public static Observable<AuthResult> createUserWithEmailAndPassword(@NonNull final FirebaseAuth firebaseAuth,
                                                                         @NonNull final String email,
                                                                         @NonNull final String password) {
-        return Observable.create(new Observable.OnSubscribe<AuthResult>() {
+        return Observable.unsafeCreate(new Observable.OnSubscribe<AuthResult>() {
             @Override
             public void call(final Subscriber<? super AuthResult> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseAuth.createUserWithEmailAndPassword(email, password));
+                RxTask.assignOnTask(subscriber, firebaseAuth.createUserWithEmailAndPassword(email, password));
             }
         });
     }
@@ -77,21 +77,21 @@ public class RxFirebaseAuth {
     @NonNull
     public static Observable<ProviderQueryResult> fetchProvidersForEmail(@NonNull final FirebaseAuth firebaseAuth,
                                                                          @NonNull final String email) {
-        return Observable.create(new Observable.OnSubscribe<ProviderQueryResult>() {
+        return Observable.unsafeCreate(new Observable.OnSubscribe<ProviderQueryResult>() {
             @Override
             public void call(final Subscriber<? super ProviderQueryResult> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseAuth.fetchProvidersForEmail(email));
+                RxTask.assignOnTask(subscriber, firebaseAuth.fetchProvidersForEmail(email));
             }
         });
     }
 
     @NonNull
     public static Observable<Void> sendPasswordResetEmail(@NonNull final FirebaseAuth firebaseAuth,
-                                                                @NonNull final String email) {
-        return Observable.create(new Observable.OnSubscribe<Void>() {
+                                                          @NonNull final String email) {
+        return Observable.unsafeCreate(new Observable.OnSubscribe<Void>() {
             @Override
             public void call(final Subscriber<? super Void> subscriber) {
-                RxHandler.assignOnTask(subscriber, firebaseAuth.sendPasswordResetEmail(email));
+                RxTask.assignOnTask(subscriber, firebaseAuth.sendPasswordResetEmail(email));
             }
         });
     }
@@ -99,7 +99,7 @@ public class RxFirebaseAuth {
     @NonNull
     public static Observable<FirebaseUser> observeAuthState(@NonNull final FirebaseAuth firebaseAuth) {
 
-        return Observable.create(new Observable.OnSubscribe<FirebaseUser>() {
+        return Observable.unsafeCreate(new Observable.OnSubscribe<FirebaseUser>() {
             @Override
             public void call(final Subscriber<? super FirebaseUser> subscriber) {
                 final FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {

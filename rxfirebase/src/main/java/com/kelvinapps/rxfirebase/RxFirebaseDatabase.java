@@ -22,7 +22,7 @@ public class RxFirebaseDatabase {
 
     @NonNull
     public static Observable<DataSnapshot> observeValueEvent(final Query query) {
-        return Observable.create(new Observable.OnSubscribe<DataSnapshot>() {
+        return Observable.unsafeCreate(new Observable.OnSubscribe<DataSnapshot>() {
             @Override
             public void call(final Subscriber<? super DataSnapshot> subscriber) {
                 final ValueEventListener valueEventListener = query.addValueEventListener(
@@ -54,7 +54,7 @@ public class RxFirebaseDatabase {
 
     @NonNull
     public static Observable<DataSnapshot> observeSingleValueEvent(@NonNull final Query query) {
-        return Observable.create(new Observable.OnSubscribe<DataSnapshot>() {
+        return Observable.unsafeCreate(new Observable.OnSubscribe<DataSnapshot>() {
             @Override
             public void call(final Subscriber<? super DataSnapshot> subscriber) {
                 query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -80,7 +80,7 @@ public class RxFirebaseDatabase {
     @NonNull
     public static Observable<RxFirebaseChildEvent<DataSnapshot>> observeChildEvent(
             @NonNull final Query query) {
-        return Observable.create(new Observable.OnSubscribe<RxFirebaseChildEvent<DataSnapshot>>() {
+        return Observable.unsafeCreate(new Observable.OnSubscribe<RxFirebaseChildEvent<DataSnapshot>>() {
             @Override
             public void call(final Subscriber<? super RxFirebaseChildEvent<DataSnapshot>> subscriber) {
                 final ChildEventListener childEventListener = query.addChildEventListener(
